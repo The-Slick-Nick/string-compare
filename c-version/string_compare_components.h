@@ -89,7 +89,7 @@ Add a new element of data to current linked list from the right.
     head->length++;
 }
 
-struct listItem* list_remove(struct listHead* head, int data)
+void list_remove(struct listHead* head, int data)
 /*
 Remove the first list element where data equal to provided, traversing
 from left to right. (head->first->next->last)
@@ -102,7 +102,7 @@ removed.
     // Resolve edge cases near the head
     if(head->length == 0)
     {
-        return NULL;
+        return;
     }
     else if(head->length == 1)
     {
@@ -112,13 +112,10 @@ removed.
             head->first = NULL;
             head->last = NULL;
             head->length--;
-            return hold;
+            free(hold);
 
         }
-        else
-        {
-            return NULL;
-        }
+        return;
     }
     // length >= 2 - check first item independently
     if(head->first->data == data)
@@ -126,7 +123,7 @@ removed.
         struct listItem* hold = head->first;
         head->first = head->first->next;
         head->length--;
-        return hold;
+        free(hold);
     } 
 
     // since length >= 2 here, we start at 2nd element to ensure previous != NULL
@@ -139,14 +136,82 @@ removed.
         {
             prev->next = current->next;
             head->length--;
-            return current;
+            free(current);
+            return;
         }
         prev = current;
         current = current->next;
     }
+}
 
-    // Natural exit, no data found
-    return NULL;
+int list_pop_next_highest(struct listHead* head, int target)
+/*
+Traverses list left to right until it finds a listItem with data > target. Removes that element from list and returns
+that element's data. If none found higher than target, returns -1.
+
+Works only for positive integers.
+*/
+{
+    int to_return;  // Integer to store data to return if necessary
+
+    // Check edge cases of length == 0 and length == 1
+    if(head->length == 0)
+    {
+        return -1;
+    }
+    else if(head->length == 1)
+    {
+        if(head->first->data > target)
+        {
+            struct listItem* temp = head->first;
+            to_return = temp->data;
+            head->first = NULL;
+            head->last = NULL;
+            head->length--;
+            free(temp);
+            return to_return;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    struct listItem* previous = head->first;
+    struct listItem* current = previous->next;
+
+    while(current != NULL)
+    {
+        if(current->data > target)
+        {
+            to_return = current->data;
+            previous->next = current->next;
+            head->length--;
+            free(current);
+            return to_return;
+        }
+        previous = current;
+        current = current->next;
+    }
+    return -1;
+}
+
+
+char* list_to_char_array(struct listHead* head)
+{
+    int build_i = 0;
+    char* to_return = (char*)malloc((1 + head->length) * sizeof(char));
+    struct listItem* current = head->first;
+
+    while(current != NULL)
+    {
+        *(to_return + build_i) = current->data;
+        build_i++;
+        current = current->next;
+    }
+    *(to_return + build_i) = '\0';
+
+    return to_return;
 }
 
 

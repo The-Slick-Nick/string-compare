@@ -3,6 +3,8 @@
 #include <math.h>
 #include <string.h>
 #include <stdbool.h>
+#include <time.h>
+
 #include "string_compare_components.h"
 
 
@@ -39,6 +41,28 @@ To be used for sizing filtered char arrays
     }
 
     return num_common;
+}
+
+char* filter_common_chars2(const char* target, const char* basis)
+{
+    struct listHead* common = list_init();
+    int cdist[256] = {0};
+
+    for(int i2 = 0; basis[i2] != '\0'; i2++)
+    {
+        cdist[basis[i2]]++;
+    }
+
+    for(int i1 = 0; target[i1] != '\0'; i1++)
+    {
+        if(cdist[target[i1]] > 0)
+        {
+            list_append(common, target[i1]);
+            cdist[target[i1]]--;
+        }
+    }
+
+    return list_to_char_array(common);
 }
 
 void filter_common_chars(char* dest1, char* dest2, const char* str1, const char* str2)
@@ -84,7 +108,7 @@ common characters between str1 and str2
     for(dist_i=0; dist_i<256; dist_i++)
     {str_dist[dist_i] = 0;}
 
-    // Model str_dist after i1
+    // Model str_dist after str1
     for (i1 = 0; *(str1+i1) != '\0'; i1++)
     {
         str_dist[*(str1+i1)]++;
@@ -140,6 +164,7 @@ assessment of their order similarity
     // Perform filter before comparison begins
     filter_common_chars(str1_common, str2_common, str1, str2);
 
+    i1 = 0;
     num_segments = 0;
     while(i1 < num_common)
     {
@@ -169,9 +194,9 @@ assessment of their order similarity
     return ( (num_common-1) - (num_segments-1) ) / (float)(num_common - 1);
 }
 
-float order_score2(char* str1, char* str2)
+float order_score2(const char* str1, const char* str2)
 {
-    struct listHead* cdist[256];
+    struct listHead* cdist[256] = {NULL};  // Array of listHead
     struct listHead* dist_i2;
     struct listItem* item_i2;  // List item for traversing dist_i2
 
@@ -179,72 +204,141 @@ float order_score2(char* str1, char* str2)
     int i1, i2;
     bool has_match;
 
+    /*
     // Initialize array of lists
     for(int i = 0; i < 256; i++)
     {
         cdist[i] = list_init();
     }
+    */
 
+    // Build a str2 index reference
     for(int i2 = 0; str2[i2] != '\0'; i2++)
     {
-        dist_i2 = cdist[str2[i2]];
-        list_append(dist_i2, i2);
+        if(cdist[str2[i2]] == NULL)
+        {
+            cdist[str2[i2]] = list_init();
+        }
+
+        dist_i2 = cdist[str2[i2]];  // Identify linked list representing this character
+        list_append(dist_i2, i2);  // Add index to above identified list
     }
 
     int num_common = 0; // number of common chars in str1 & str2
-    int i2_min = -1;
+    int i2_min = -1;  // Most recent index match of a str1 character in str2. 
     int num_resets = 0;  // number of times i2_min has been reset
+    int next_highest;  // Value returned from list_pop_next_highest
+
+
     for(i1 = 0; str1[i1] != '\0'; i1++)
     {
-        dist_i2 = cdist[str1[i1]];
-        if(dist_i2->length == 0)
-        {
-            continue;
-        }
+        dist_i2 = cdist[str1[i1]];  // Find str2's distribution of current str1 char
+        if(dist_i2 == NULL)
+        // if(dist_i2->length == 0)
+        // If str2 has 0 of these, char not common and thus not considered
+        {continue;}
+        else if(dist_i2->length == 0)
+        {continue;}
         else
-        // i2 has a char from i1, one more in-common
-        {
-            num_common++;
-        }
+        // At least one remaining match available in str2, common char found
+        {num_common++;}
 
         has_match=false;
         while(!has_match)
         {
-            item_i2 = dist_i2->next;
-            while(item_i2 != NULL)
-            {
-                if(item_i2->data > i2_min)
-                {
-                    i2_min = item_i2->data;
-                    list_remove(dist_i2, item_i2->data);
-                    has_match=true;
-                    break;
-                }
-                item_i2 = item_i2->next;
-            }
-            if(!has_match)
-            // If i2 has chars but none are below current index, reset & try again
+            next_highest = list_pop_next_highest(dist_i2, i2_min);
+            if(next_highest == -1)
             {
                 num_resets++;
                 i2_min=-1;
+            }
+            else
+            {
+                i2_min = next_highest;
+                has_match = true;
             }
         }
     }
 
 
     if(num_common == 0)
-    {
-        return 0;
-    } else if (num_common == 1)
-    {
-        return 1;
-    } else
+    {return 0;}
+    else if (num_common == 1)
+    {return 1;}
+    else
     {
         // Max resets = num_common - 1
         // (since the first character will always be found without a reset)
         return ((num_common - 1) - num_resets) / (float)(num_common - 1);
     }
    
+}
+
+float order_score3(const char* str1, const char* str2)
+{
+    int i1; // Index for accessing str1_common
+    int i2; // Index for accessing str2_common
+    int num_common;  // Number of characters common to str1 & str2
+    int num_segments;  // Number of segments needed to match each character
+
+    // Identify the number of characters total shared
+    num_common = num_common_chars(str1, str2);
+
+    // Break early for edge cases - protect from dividing by 0 later
+    if(num_common == 0)
+        {return(float)0;}
+    else if(num_common == 1)
+        {return (float)1;}
+
+    // Now define our common strings
+    char str1_common[num_common];
+    char str2_common[num_common];
+
+    // Perform filter before comparison begins
+    filter_common_chars(str1_common, str2_common, str1, str2);
+
+    int i2_start = 0;
+    bool shift_start = true;
+    char chr1, chr2;
+
+    i1 = 0;
+    num_segments = 0;
+    while(i1 < num_common)
+    {
+        num_segments++;
+        i2 = i2_start;
+        shift_start = true;
+        while(i2 < num_common && i1 < num_common)
+        {
+            chr1 = *(str1_common+i1);
+            chr2 = *(str2_common+i2);
+
+            if(chr1 == chr2)
+            {
+                // Mark str2 char as considered
+                str2_common[i2] = '\0';
+
+                // Move i1 only if a match is found
+                i1++;
+            }
+            else if(shift_start && chr2 != '\0')
+            // If characters don't match but str2 is valid, jump detected - don't shift start location
+                {shift_start=false;}   
+
+            // Always move i2
+            i2++;
+            // Move i2's starting location if still indicated
+            i2_start += shift_start;
+
+        }
+        // Note that i1 need not be incremented here. As str1_common and
+        // str2_common are both filtered for the same set of chars, at least
+        // one i1++ call will be reached per i1 char.
+    }
+
+    // Score considers the number of ADDITIONAL segments (from 1) needed to
+    // match every character (as each comparison will always have at least 1)
+    return ( (num_common-1) - (num_segments-1) ) / (float)(num_common - 1);
 }
 
 
@@ -301,53 +395,82 @@ of how similar the two strings are.
 }
 
 
-char* random_string(int num_chars)
+int score_test()
 {
-    char* new_str = malloc(num_chars + 1);
-    int rchar;
+    char str1[] = "123 main street";
+    char str2[] = "123 oak avenue";
+    
+    float osc1 = order_score(str1, str2);
+    float osc3 = order_score3(str1, str2);
+    float lsc = letter_score(str1, str2);
+    float sc = string_compare(str1, str2);
 
-    for(int i = 0; i <= num_chars; i++)
+    float b_osc1 = order_score(str2, str1);
+    float b_osc3 = order_score3(str2, str1);
+    float b_lsc = letter_score(str2, str1);
+    float b_sc = string_compare(str2, str1);
+
+    printf("oscore1: %f\noscore2: %f\nlscore: %f\nstring compare: %f\n", osc1, osc3, lsc, sc);
+    printf("BACKWARDS\n");
+    printf("oscore1: %f\noscore3: %f\nlscore: %f\nstring compare: %f\n", b_osc1, b_osc3, b_lsc, b_sc);
+}
+
+
+int time_test()
+{
+    char str1[] = "123 main street";
+    char str2[] = "123 oak avenue";
+    
+    int i;
+    clock_t start, end;
+    double cpu_time_used;
+
+    // 100000 order_score1s
+    start = clock();
+    for(i = 0; i < 100000; i++)
     {
-        rchar = 62 + (int)(rand() % 25);
-        *(new_str + i) = (char)rchar;
+        order_score(str1, str2);
     }
-    *(new_str+num_chars+1) = "\0";
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
-    return new_str;
+    printf("Time used by order score 1: %f\n", cpu_time_used);
 
+    // 100000 order_score3s
+    start = clock();
+    for(i = 0; i < 100000; i++)
+    {
+        order_score3(str1, str2);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time used by order score 3: %f\n", cpu_time_used);
+
+    // 100000 letter_scores
+    start = clock();
+    for(i = 0; i < 100000; i++)
+    {
+        letter_score(str1, str2);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time used by letter score: %f\n", cpu_time_used);
+
+    // 100000 string_compares
+    start = clock();
+    for(i = 0; i < 100000; i++)
+    {
+        string_compare(str1, str2);
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("Time used by string compare: %f\n", cpu_time_used);
 }
 
 int main()
-{\
-
-    char* str1;
-    char* str2;
-
-    int r1;
-    int r2;
-
-    float os1;
-    float os2;
-
-    int num_common;
-    int i;
-
-    for(int numtests = 0; numtests < 5; numtests++)
-    {
-
-        str1 = random_string(10);
-        str2 = random_string(10);
-
-        os1 = order_score(str1, str2);
-        os2 = order_score2(str1, str2);
-        num_common = num_common_chars(str1, str2);
-        printf("_______________________\n");
-        printf("str1: %s\nstr2: %s\n", str1, str2);
-        printf("num common %d", num_common);
-        printf("\n");
-        printf("oscore1: %f", os1);
-        printf("\n");
-        printf("oscore2: %f", os2);
-        printf("\n");
-        }
+{
+    time_test();
 }
