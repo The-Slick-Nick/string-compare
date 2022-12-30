@@ -217,8 +217,3 @@ of how similar the two strings are.
         letter_score(str1, str2) * order_score(str1, str2)
     );
 }
-
-int main()
-{
-    string_compare("123 main street", "456 oak avenue apt 123");
-}
