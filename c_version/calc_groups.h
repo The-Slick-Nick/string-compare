@@ -1,38 +1,3 @@
-/*
-Specific implementation of a nested list for use in order_score.h
-Outer linked list containing inner linked lists containing elements
-[
-    [ (a, b), (c, d)],
-    [ (e, f)],
-    [ (f, g)]
-]
-*/
-
-/*
-
-TODO - DON'T NEED THREE SETS OF LISTS
-JUST NEED:
-1. MANAGER STRUCT
-2. CHAIN OF _calcitem S
-
-MANAGER STRUCT SHOULD TABULATE TOTAL OFFSET DIFFERENCE AS IT GOES
-ALSO NEEDS TO TRACK NUMBER OF MATCHED CHARACTERS (VS NEW GROUPS)
-
-A MATCHED CHARACTER CAN SIMPLY REPLACE THE IDX1/IDX2 OF THE THING IT IS BEING
-ADDED ONTO SO LONG AS TWO THINGS ARE GLOBALLY TABULATED
-* TOTAL OFFSET
-* NUMBER OF MATCHED CHARACTERS
-
-AND FINAL SCORE (in order score) WILL BE ((l2 - 2) * num_macthes) - total offset
-THAT IS THEN DIVIDED BY ((l2 - 2) * (l1 - 1))
-WHERE l1 AND l2 ARE THE LENGTHS OF THE SHORTER AND LONGER STRINGS, RESPECTIVELY
-
-
-MAX_IDX2 CAN ALSO BE GLOBALLY TRACKED ANY TIME SOMETHING IS ADDED/UPDATED
-FOR EASY CHECKING IF SOMETHIS IS VALID TO BE ADDED
-
-*/
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -43,14 +8,6 @@ typedef struct CalcItem {
     int idx2;
     struct CalcItem* next;
 } _calcitem;
-
-
-// // "private" struct holding reference a _calcitem head and to next linked _calclist
-// typedef struct CalcGroupList {
-//     _calcitem* item_head;
-//     struct CalcGroupList* next;
-// } _calclist;
-
 
 // Manager struct for CalcGroup
 typedef struct CalcGroup {
@@ -81,6 +38,19 @@ CalcGroup* CalcGroup_init()
     group->first = NULL;
     return group;
 }
+
+/*
+NOTE TO SELF:
+CalcGroup keeps track of grand total offset difference. The final score
+should be tabulated as:
+assuming l2 = len(longer string) - 2 and l1 = len(shorter string) - 1
+
+total score = 
+    (num matches * l2) - total_offset_sum
+    ______________________________________
+    l2 * l1
+
+*/
 
 void _calcitem_deconstruct(_calcitem* item)
 {
@@ -168,7 +138,8 @@ void CalcGroup_addNew(CalcGroup* group, int idx1, int idx2)
 
 }
 
-// Attempts to add a new _calcitem with (idx1, idx2)
+// Attempts to add a new _calcitem with (idx1, idx2). Returns a boolean flag indicating
+// if placement was successful.
 bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
 {
     // If new item cannot be placed, return false
@@ -210,11 +181,9 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
    if (best_item == NULL)
         return false;
 
-    // Need to update min_idx2 if it was replaced
+    // Need to update min_idx2 if its _calcitem replaced it
     if (best_item->idx2 == group->idx2_min)
     {
-        // Decide what to replace with
-        
         // Use replacement if it is smaller than second minimum idx2
         if (idx2 < secondmin_idx2)
             group->idx2_min = idx2;

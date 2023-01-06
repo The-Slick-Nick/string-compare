@@ -49,15 +49,14 @@ int calc_groups_test()
     CalcGroup* group = CalcGroup_init();
 
 
-    CalcGroup_addNew(group, 1, 1);
-    CalcGroup_addNew(group, 3, 3);
-    CalcGroup_print(group);
-    
-    printf("____________\n");
-
-    CalcGroup_addBest(group, 2, 5);
-
-
+    for (int i = 1; i < 100; i++)
+    {
+        for (int j = 1; j < 100; j++)
+        {
+            if (!CalcGroup_addBest(group, i, j))
+                CalcGroup_addNew(group, i, j);
+        }
+    }
     CalcGroup_print(group);
     CalcGroup_deconstruct(group);
 }
