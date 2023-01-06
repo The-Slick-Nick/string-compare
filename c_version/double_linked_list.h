@@ -7,12 +7,17 @@ Doubly linked list
 #ifndef INCLUDE_GUARD_DOUBLE_LINKED_LIST
 #define INCLUDE_GUARD_DOUBLE_LINKED_LIST
 
+
+// Item to store in a DoubleLinkeedList
+// Contains references to next and prev
 typedef struct DoubleLinkedListItem {
     int data;
     struct DoubleLinkedListItem* next;
     struct DoubleLinkedListItem* prev;
 } DllItem;
 
+
+// Head for a list 
 typedef struct DoubleLinkedList {
     int length;
     DllItem* first;

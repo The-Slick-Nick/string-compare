@@ -103,6 +103,8 @@ double __comp2__(char* str1, char* str2, int l1, int l2)
         {
             new_calc_group = NList_appendList(calc_groups);
             new_calc_entry = NList_appendList(new_calc_group);
+            // Append idx1 first so we have order [idx1, idx2]
+            // could also do NList_insert(..., idx1) and NList_append(..., idx2) for safety
             NList_append(new_calc_entry, idx1);
             NList_append(new_calc_entry, dll_current->data);
         }

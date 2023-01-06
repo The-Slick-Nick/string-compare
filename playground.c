@@ -1,6 +1,7 @@
 #include "c_version\double_linked_list.h"
 #include "c_version\nested_list.h"
 #include "c_version\order_score.h"
+#include "c_version\calc_groups.h"
 
 int dll_test()
 {
@@ -43,9 +44,27 @@ int oscore_test()
     order_score("stressed", "dessert");
 }
 
+int calc_groups_test()
+{
+    CalcGroup* group = CalcGroup_init();
+
+
+    CalcGroup_addNew(group, 1, 1);
+    CalcGroup_addNew(group, 3, 3);
+    CalcGroup_print(group);
+    
+    printf("____________\n");
+
+    CalcGroup_addBest(group, 2, 5);
+
+
+    CalcGroup_print(group);
+    CalcGroup_deconstruct(group);
+}
+
 int main()
 {
-    oscore_test();
+    calc_groups_test();
 
     return 0;
 }

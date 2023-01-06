@@ -4,6 +4,11 @@
 #ifndef INCLUDE_GUARD_NESTED_LIST
 #define INCLUDE_GUARD_NESTED_LIST
 
+// Item to store within a NestedList
+// contains reference to next item in list
+// contains EITHER integer data OR a link to another List (head) item
+// Can technically contain both but that is not supported directly by my written methods
+// (Also it feels wrong but I guess you can do it if you want)
 typedef struct NestedListItem {
     
     int data;                       // Data for this list item
