@@ -48,6 +48,15 @@ int calc_groups_test()
 {
     CalcGroup* group = CalcGroup_init();
 
+    char str1[] = "dessert";
+    char str2[] = "stressed";
+    // S T R E S S E D
+    // 0 1 2 3 4 5 6 7
+
+    // idx1 indices
+    int pairings_left[] = {0, 1, 2, 3, 4, 5, 6}
+    // idx2 indices
+    int pairings_right[] = {7, }
 
     for (int i = 1; i < 100; i++)
     {

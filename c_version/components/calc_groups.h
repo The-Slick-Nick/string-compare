@@ -1,3 +1,19 @@
+/*----------------------------------------------------------------------------------------
+calc_groups.h
+
+For use with methods mss_score and mod
+
+Calc group - stores a linked list of items representing character matches between
+str1 and str2.
+
+Each item in a CalcGroup represents a matching 
+
+New potential character matches between one string and another are assessed against
+each item in the CalcGroup, appending to an existing if both indices are higher
+than on
+----------------------------------------------------------------------------------------*/
+
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -43,12 +59,13 @@ CalcGroup* CalcGroup_init()
 NOTE TO SELF:
 CalcGroup keeps track of grand total offset difference. The final score
 should be tabulated as:
-assuming l2 = len(longer string) - 2 and l1 = len(shorter string) - 1
 
 total score = 
     (num matches * l2) - total_offset_sum
     ______________________________________
     l2 * l1
+
+Where l2 = len(longer string) -2 and l1 = len(shorter string) - 1
 
 */
 
