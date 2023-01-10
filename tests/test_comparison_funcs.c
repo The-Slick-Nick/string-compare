@@ -1,4 +1,4 @@
-#include "D:\Projects\EWENIT\EWENIT\EWENIT.c"
+#include "../../EWENIT/EWENIT/EWENIT.c"
 #include "test_utils\random_string.h"
 #include "test_utils\string_concat.h"
 
@@ -276,7 +276,7 @@ void test_improved_lcs_score()
         str2 = random_string();
         score1 = lcs_score(str1, str2);
         score2 = improved_lcs_score(str1, str2);
-        if (score1 != score2)
+        if (!ALMOST_EQUAL_DOUBLE(score1, score2))
         {
             TEST_FAIL_FMT(
                 "lcs and improved_lcs differ: %f != %f\n      %s\n      %s",

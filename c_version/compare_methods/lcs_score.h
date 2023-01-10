@@ -87,68 +87,84 @@ double lcs_score(const char* str1, const char* str2)
 
 }
 
-// Improved version of lcs score 
 double improved_lcs_score(const char* str1, const char* str2)
 {
-
     int idx1, idx2;
     int idx1_temp, idx2_temp;
     int len1, len2;
     char chr1, chr2;
 
     int substr_score;
-    int max_substr_score = 0;
+    int max_substr_score;
 
-    IdxList* list;
-    IdxItem* item;
-    IdxList* idx_ref[256] = {NULL};
+    int char_counts[256] = {0};     // Counts of characters in str2 by their ascii val
+    int* idx_ref[256] = {NULL};     // Arrays of each index found in str2 by char
+    int min_indices[256] = {0};     // Index for idx_ref to write to - matched by index
+    int min_idx;
 
 
-    len1 = strlen(str1);  // Only len1 needs calculated this way - str2 is looped through
-                          // to build the idx_ref anyway
 
-    // Model index reference after str2
+    // Loop through str2 once to get counts of all characters
     len2 = 0;
     for (idx2 = 0; *(str2 + idx2) != '\0'; idx2++)
     {
         len2++;
-        chr2 = *(str2 + idx2);
+        char_counts[ *(str2 + idx2) ]++;
+    }
+    len1 = strlen(str1);
+
+    // Early exit conditions
+
+    // Exactly one length == 0 - score 0
+    if ( (len1 == 0) != (len2 == 0))
+        return 0;
+
+    // Loop through str2 again to build its index reference
+    int chr2_count;
+    for (idx2 = 0; *(str2 + idx2) != '\0'; idx2++)
+    {
+        chr2 = *(str2 + idx2);              // Current character
+        chr2_count = char_counts[chr2];     // Number of this char in str2
+        min_idx = min_indices[chr2];        // Current index to write to in idx_ref
+
+        // Allocate memory for str2 index array we haven't yet
         if (idx_ref[chr2] == NULL)
-            idx_ref[chr2] = IdxList_init();
+        {
+            idx_ref[chr2] = (int*)malloc(chr2_count * sizeof(int));
+        }
 
-        list = idx_ref[chr2];
-
-        IdxList_append(list, idx2);
+        // Add idx2 to this character's reference - update to-write-to index
+        *(idx_ref[chr2] + min_idx) = idx2;
+        min_indices[chr2]++;
     }
 
-    if ((len1 == 0) != (len2 == 0))
-        return 0.0;
 
-
+    // Loop through str1 and match indices to str2
+    max_substr_score = 0;
     for (idx1 = 0; *(str1 + idx1) != '\0'; idx1++)
     {
-        // Exit if a better substr can't be found
-        if ( (len1 - idx1) <= max_substr_score)
+        // Break when we can't find a better score
+        if (len1 - idx1 <= max_substr_score)
             break;
 
-        list = idx_ref[*(str1 + idx1)];
-        if (list == NULL)
-            continue;
+        // Consider each associated idx2 for this character
+        for (int i = 0; i < char_counts[ *(str1 + idx1) ]; i++)
+        {   // idx_ref[str1_chr][i]
+            idx2 = *(idx_ref[ *(str1 + idx1) ] + i);
 
-        for (item = list->head; item != NULL; item = item->next)
-        {
-            // Exit if a better substr can't be found - note that each list will have
-            // indices in ascending order, so we can `break` here
-            if ( (len2 - item->idx) <= max_substr_score)
+            // Stop considering this char if can't find better score
+            // (idx2 is in ascending order here)
+            if (len2 - idx2 <= max_substr_score)
                 break;
 
-            substr_score = 0;
             idx1_temp = idx1;
-            idx2_temp = item->idx;
+            idx2_temp = idx2;
 
             chr1 = *(str1 + idx1_temp);
             chr2 = *(str2 + idx2_temp);
+            substr_score = 0;
 
+            // Increment both as long as they match - checking substr length
             while (chr1 == chr2)
             {
                 if (chr1 == '\0')
@@ -161,23 +177,20 @@ double improved_lcs_score(const char* str1, const char* str2)
                 chr2 = *(str2 + idx2_temp);
             }
 
+            // Check vs current running max
             if (substr_score > max_substr_score)
                 max_substr_score = substr_score;
-
         }
-
     }
 
+
+    // Now free our allocated memory
     for (int i = 0; i < 256; i++)
-    {
-        list = idx_ref[i];
-        if (list != NULL)
-            IdxList_deconstruct(list);
-    }
-    // Return ratio of longest substr length to the short string (which would be the
-    // maximum length substring possible)
+        free(idx_ref[i]);
+
+    // Return
     if (len1 > len2)
-        return max_substr_score / (float)len2;
+        return max_substr_score / (double)len2;
     else
-        return max_substr_score / (float)len1;
+        return max_substr_score / (double)len1;
 }

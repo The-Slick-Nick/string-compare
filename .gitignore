@@ -4,7 +4,9 @@ test_main.exe
 __pycache__
 build
 dist
+todo.txt
 
+*.exe
 *.egg-info
 *.egg
 *.o
