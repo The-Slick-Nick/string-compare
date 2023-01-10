@@ -9,7 +9,6 @@ to the length of the shorter string
 ----------------------------------------------------------------------------------------*/
 #include <stdlib.h>
 #include <string.h>
-#include "../components/idx_list.h"
 
 // Longest Common Substring score
 double lcs_score(const char* str1, const char* str2)
@@ -101,7 +100,6 @@ double improved_lcs_score(const char* str1, const char* str2)
     int* idx_ref[256] = {NULL};     // Arrays of each index found in str2 by char
     int min_indices[256] = {0};     // Index for idx_ref to write to - matched by index
     int min_idx;
-
 
 
     // Loop through str2 once to get counts of all characters

@@ -6,6 +6,37 @@
 #include "../c_version/compare_methods/lcs_score.h"
 
 #include <time.h>
+#include <stdbool.h>
+
+/*========================================================================================
+HELPER FUNCS
+========================================================================================*/
+double time_comparison_func(double(*compare_func)(), int num_tests)
+{
+    clock_t start;
+    clock_t end;
+    double time_taken = 0;
+
+    char* str1;
+    char* str2;
+
+    start = clock();
+
+    for (int i = 0; i < num_tests; i++)
+    {
+        str1 = random_string();
+        str2 = random_string();
+        // Make sure to only time the comparison portion
+        start = clock();
+        compare_func(str1, str2);
+        end = clock();
+        time_taken += ((double)(end - start)) / CLOCKS_PER_SEC;
+        free(str1);
+        free(str2);
+    }
+    return time_taken;
+}
+
 
 /*========================================================================================
 SUBTEST TEMPLATES
@@ -270,6 +301,9 @@ void test_improved_lcs_score()
     char* str2;
     double score1;
     double score2;
+    bool subtest_failed;
+
+    subtest_failed = false;
     for (int i = 0; i < 100; i++)
     {
         str1 = random_string();
@@ -284,12 +318,33 @@ void test_improved_lcs_score()
             );
             free(str1);
             free(str2);
-            return;
+            subtest_failed = true;
+            break;
         }
+        free(str1);
+        free(str2);
     }
-    TEST_PASS("lcs and improved_lcs generate same score for 100 tests");
-    free(str1);
-    free(str2);    
+    if (!subtest_failed)
+        TEST_PASS("lcs and improved_lcs generate same score for 100 tests");
+
+
+    // Time 100k for each
+    double lcs_time = time_comparison_func(lcs_score, 100000);
+    double improved_lcs_time = time_comparison_func(improved_lcs_score, 100000);
+    if (improved_lcs_time < lcs_time)
+    {
+        TEST_PASS_FMT(
+            "improved_lcs performed faster than lcs over 100k tests: %f < %f",
+            improved_lcs_time, lcs_time
+        );
+    }
+    else
+    {
+        TEST_FAIL_FMT(
+            "improved_lcs performed slower than lcs over 100k tests: %f > %f",
+            improved_lcs_time, lcs_time
+        );
+    }  
 }
 
 /* =======================================================================================
