@@ -188,12 +188,19 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
         if (loop_idx2 > idx2)
             continue;
 
-        loop_osdiff = abs((loop_idx1 - idx1) - (loop_idx2 - idx2));
+        loop_osdiff = abs((idx2 - loop_idx2) - (idx1 - loop_idx1));
+
+        printf(
+            "    item (%d, %d) has osdiff %d\n",
+            loop_idx1, loop_idx2, loop_osdiff
+        );
 
         // Check if we found a better match
         if (loop_osdiff < min_osdiff_found)
+        {
             min_osdiff_found = loop_osdiff;
             best_item = current;
+        }
    }
 
     // Didn't find any valid items - no placements
@@ -215,12 +222,6 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
     group->matches++;
     group->offset_difference += min_osdiff_found;  // best_item should have lowest offset
 
-    // Update minimum if:
-    // 1. Our previous minimum index was replaced
-    // 2. The second minimum is smaller than the replacement
-    if (best_item->idx2 == group->idx2_min && idx2 > secondmin_idx2)
-        group->idx2_min = secondmin_idx2;
-
     // Finally, update the element in question
     _calcitem_update(best_item, idx1, idx2);
     return true;
@@ -231,5 +232,60 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
 // Returns a boolean flag indicating if placement was successful.
 bool CalcGroup_addFirst(CalcGroup* group, int idx1, int idx2)
 {
+    // If new item cannot be placed, return false
+    if (idx2 < group->idx2_min || group->length == 0)
+        return false;
 
+   int loop_idx1;                   // idx1 on current item in loop
+   int loop_idx2;                   // idx2 on current item in loop
+
+   int secondmin_idx2 = INT_MAX;    // Second minimum idx2 in group
+   _calcitem* best_item = NULL;     // Best candidate for placement (first valid found)
+   int osdiff_toadd = 0;            // Offset associated with best_item;
+
+   for (_calcitem* current = group->first; current != NULL; current = current->next)
+   {
+        loop_idx1 = current->idx1;
+        loop_idx2 = current->idx2;
+
+        // Maintain tracking second smallest current idx2 (this only works because
+        // no idx2 can be repeated in group, as they represent character indices)
+        if (loop_idx2 > group->idx2_min && loop_idx2 < secondmin_idx2)
+            secondmin_idx2 = loop_idx2;
+
+        // Skip this loop if we cannot place (loop_idx2 too big)
+        if (loop_idx2 > idx2)
+            continue;
+
+        // Set best_item the first time we find a valid element & save its offset
+        if (best_item == NULL)
+        {
+            osdiff_toadd = abs((idx2 - loop_idx2) - (idx1 - loop_idx1));
+            best_item = current;
+        }
+
+   }
+
+    // Didn't find any valid items - no placements
+   if (best_item == NULL)
+        return false;
+
+    // Need to update min_idx2 if its _calcitem replaced it
+    if (best_item->idx2 == group->idx2_min)
+    {
+        // Use replacement if it is smaller than second minimum idx2
+        if (idx2 < secondmin_idx2)
+            group->idx2_min = idx2;
+        // Otherwise update to second minimum
+        else 
+            group->idx2_min = secondmin_idx2;
+    }
+
+    // Update with our found item
+    group->matches++;
+    group->offset_difference += osdiff_toadd;  // best_item should have lowest offset
+
+    // Finally, update the element in question
+    _calcitem_update(best_item, idx1, idx2);
+    return true;
 }
