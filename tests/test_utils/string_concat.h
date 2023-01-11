@@ -3,6 +3,9 @@ string_concat.h
 
 Because <string.h> function strcat doesn't work like I need it to
 ========================================================================================*/
+#ifndef INCLUDE_GUARD_STRING_CONCAT
+#define INCLUDE_GUARD_STRING_CONCAT
+
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
@@ -50,3 +53,5 @@ char* string_concat(int num_strings, ...)
     va_end(to_concat);
     return to_return;
 }
+
+#endif

@@ -155,8 +155,10 @@ void CalcGroup_addNew(CalcGroup* group, int idx1, int idx2)
 
 }
 
-// Attempts to add a new _calcitem with (idx1, idx2). Returns a boolean flag indicating
-// if placement was successful.
+// Attempts to add a new _calcitem with (idx1, idx2) at the best possible location by 
+// minimizing offset difference by current indices idx1 and idx2 vs a _calcitem's
+// idx1 and idx2.
+// Returns a boolean flag indicating if placement was successful.
 bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
 {
     // If new item cannot be placed, return false
@@ -224,3 +226,10 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
     return true;
 }
 
+// Attempt to add a new _calcitem with (idx1, idx2) at the first possible placement
+// location.
+// Returns a boolean flag indicating if placement was successful.
+bool CalcGroup_addFirst(CalcGroup* group, int idx1, int idx2)
+{
+
+}

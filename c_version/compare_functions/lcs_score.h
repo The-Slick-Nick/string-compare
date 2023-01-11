@@ -7,6 +7,10 @@ lcs_score
 Returns the ratio of the length of the longest common substring between to strings
 to the length of the shorter string
 ----------------------------------------------------------------------------------------*/
+#ifndef INCLUDE_GUARD_LCS_SCORE
+#define INCLUDE_GUARD_LCS_SCORE
+
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -192,3 +196,5 @@ double improved_lcs_score(const char* str1, const char* str2)
     else
         return max_substr_score / (double)len1;
 }
+
+#endif

@@ -4,6 +4,9 @@ cdist_score.h
 cdist_score
 Calculates the difference in character distributions between two strings
 ----------------------------------------------------------------------------------------*/
+#ifndef INCLUDE_GUARD_CDIST_SCORE
+#define INCLUDE_GUARD_CDIST_SCORE
+
 #include <stdlib.h>
 
 double cdist_score(const char* str1, const char* str2)
@@ -34,3 +37,5 @@ double cdist_score(const char* str1, const char* str2)
     double final_score = (total_len - total_diff) / (double)total_len;
     return final_score;
 }
+
+#endif

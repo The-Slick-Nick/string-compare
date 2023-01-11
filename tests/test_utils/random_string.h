@@ -1,6 +1,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef INCLUDE_GUARD_RANDOM_STRING
+#define INCLUDE_GUARD_RANDOM_STRING
+
 #define RANDOMSTR_MIN_LENGTH    1
 #define RANDOMSTR_MAX_LENGTH    100
 
@@ -70,3 +73,5 @@ char* random_string_charset(int char_set)
     *(return_str + i) = '\0';
     return return_str;
 }
+
+#endif
