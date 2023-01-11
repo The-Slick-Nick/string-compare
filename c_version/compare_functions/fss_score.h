@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------------------
-mss_score.h
+fcs_score.h
 
-Multi-Substring Score
+Fragmented Substring Score
 
 Behavior types:
 ---------------------------------------
@@ -13,29 +13,29 @@ PLACEMENT - how to decide which running substr (calc group) a match is placed on
     first - adds to the first discovered substring in calc group
     best - considers each calc group and places on the one with minimum offset difference
 
-mss_score
+fcs_score
     SCORING = normal
     PLACEMENT = first
 
-adjusted_mss_score
+adjusted_fss_score
     SCORING = adjusted
     PLACEMENT = best
 
 ----------------------------------------------------------------------------------------*/
-#ifndef INCLUDE_GUARD_MSS_SCORE
-#define INCLUDE_GUARD_MSS_SCORE
+#ifndef INCLUDE_GUARD_FSS_SCORE
+#define INCLUDE_GUARD_FSS_SCORE
 
 #include "../components/calc_groups.h"
 
 // Scores two strings based on the number of substring matches between the two
 
-double mss_score(char* str1, char* str2)
+double fss_score(char* str1, char* str2)
 {
     return 0;
 }
 
 
-double adjusted_mss_score(char* str1, char* str2)
+double adjusted_fss_score(char* str1, char* str2)
 {
     return 0;
 }

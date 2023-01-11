@@ -13,6 +13,7 @@ Tests on string comparison methods
 
 #include "../c_version/compare_functions/cdist_score.h"
 #include "../c_version/compare_functions/lcs_score.h"
+#include "../c_version/compare_functions/fss_score.h"
 
 #include <time.h>
 #include <stdbool.h>
@@ -94,17 +95,17 @@ void test_improved_lcs_score()
     }  
 }
 
-void test_mss_score()
+void test_fss_score()
 {
-    string_comparison_test(mss_score);
+    string_comparison_test(fss_score);
 
     // Regular mss has subset == 1 property
-    subset_test(mss_score);
+    subset_test(fss_score);
 }
 
-void test_adjusted_mss_score()
+void test_adjusted_fss_score()
 {
-    string_comparison_test(adjusted_mss_score);
+    string_comparison_test(adjusted_fss_score);
 }
 
 /* =======================================================================================

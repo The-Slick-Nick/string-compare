@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------------------
 calc_groups.h
 
-For use with methods mss_score and mod
+For use with methods fss_score methods
 
 Calc group - stores a linked list of items representing character matches between
 str1 and str2.
