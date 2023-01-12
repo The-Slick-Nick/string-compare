@@ -5,6 +5,10 @@ Helpful subfunctions for compare_functions
     choose_fss_basis
     build_
 ----------------------------------------------------------------------------------------*/
+
+#ifndef INCLUDE_GUARD_UTILITY_FUNCTIONS
+#define INCLUDE_GUARD_UTILITY_FUNCTIONS
+
 #include <stdbool.h>
 #include <assert.h>
 
@@ -128,3 +132,5 @@ int summarize_string(const char* str, int* char_counts, int** idx_ref)
     }
     return len;
 }
+
+#endif

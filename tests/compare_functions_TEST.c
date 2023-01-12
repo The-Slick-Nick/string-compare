@@ -77,8 +77,30 @@ void test_improved_lcs_score()
 
 
     // Time 100k for each
-    double lcs_time = time_comparison_func(lcs_score, 100000);
-    double improved_lcs_time = time_comparison_func(improved_lcs_score, 100000);
+    clock_t start;
+    clock_t end;
+    double lcs_time = 0;
+    double improved_lcs_time = 0;
+
+    #define TIME_TAKEN ((double)(end - start)) / CLOCKS_PER_SEC
+
+    for (int i = 0; i < 100000; i++)
+    {
+        str1 = random_string();
+        str2 = random_string();
+        start = clock();
+        lcs_score(str1, str2);
+        end = clock();
+        lcs_time += TIME_TAKEN;
+
+        start = clock();
+        improved_lcs_score(str1, str2);
+        end = clock();
+        improved_lcs_time += TIME_TAKEN;
+
+        free(str1);
+        free(str2);
+    }
     if (improved_lcs_time < lcs_time)
     {
         TEST_PASS_FMT(
@@ -101,11 +123,22 @@ void test_fss_score()
 
     // Regular mss has subset == 1 property
     subset_test(fss_score);
+    // Manually tabulated examples
+    ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)3/6);
+    ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)6/7);
+    ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
 }
 
 void test_adjusted_fss_score()
 {
     string_comparison_test(adjusted_fss_score);
+    // Manually tabulated examples
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)18/36);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)34/42);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)29/42);
+
+
+
 }
 
 /* =======================================================================================

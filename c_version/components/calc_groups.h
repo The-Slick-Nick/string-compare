@@ -190,11 +190,6 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
 
         loop_osdiff = abs((idx2 - loop_idx2) - (idx1 - loop_idx1));
 
-        printf(
-            "    item (%d, %d) has osdiff %d\n",
-            loop_idx1, loop_idx2, loop_osdiff
-        );
-
         // Check if we found a better match
         if (loop_osdiff < min_osdiff_found)
         {
