@@ -136,9 +136,42 @@ void test_adjusted_fss_score()
     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)18/36);
     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)34/42);
     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)29/42);
+}
 
+void test_naive_fss_score()
+{
+    string_comparison_test(naive_fss_score);
+    subset_test(naive_fss_score);
 
+    // should match fss_score
+    double score1, score2;
+    char *str1, *str2;
+    bool is_equal = true;
+    for (int i = 0; i < 100; i++)
+    {
+        str1 = random_string();
+        str2 = random_string();
+        score1 = naive_fss_score(str1, str2);
+        score2 = fss_score(str1, str2);
+        if (!ALMOST_EQUAL_DOUBLE(score1, score2))
+        {
+            is_equal = false;
+            TEST_FAIL_FMT(
+                "fss and naive_fss procued different scores %f vs %f\n      %s\n      %s",
+                score1, score2, str1, str2
+            );
+        }
+        free(str1);
+        free(str2);
+        if (!is_equal)
+            break;
+    }
+    if (is_equal)
+        TEST_PASS("fss and naive_fss produced the same scores for 100 tests");
 
+    // Manually tabulated examples
+    ASSERT_EQUAL_DOUBLE(naive_fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
+    ASSERT_EQUAL_DOUBLE(naive_fss_score("WREATHES", "WEATHERS"), (double)6/7);
 }
 
 /* =======================================================================================
@@ -153,5 +186,6 @@ int main()
     ADD_CASE(test_improved_lcs_score, "improved_lcs_score");
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
+    ADD_CASE(test_naive_fss_score, "naive fss score");
     EWENIT_END;
 }

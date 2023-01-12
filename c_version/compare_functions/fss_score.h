@@ -3,6 +3,17 @@ fcs_score.h
 
 Fragmented Substring Score
 
+"Fractured Substring"
+    A series of character matches between two strings where characters are in the same
+    relative order, i.e. for AGREE vs EAGER, fractured substrings would be:
+        AGREE vs EAGER
+        __R_E vs E___R => AGE
+        ____E vs E____ => R
+        _____ vs _____ => E
+    Note that fractured substrings work "without replacement", and the total combinations
+    of all characters between fractured substrings should match the total distribution
+    of matching characters between str1 and str2
+
 Behavior types:
 ---------------------------------------
 SCORING - how points are assessed
@@ -21,16 +32,7 @@ adjusted_fss_score
     SCORING = adjusted
     PLACEMENT = best
 
-"Fractured Substring"
-    A series of character matches between two strings where characters are in the same
-    relative order, i.e. for AGREE vs EAGER, fractured substrings would be:
-        AGREE vs EAGER
-        __R_E vs E___R => AGE
-        ____E vs E____ => R
-        _____ vs _____ => E
-    Note that fractured substrings work "without replacement", and the total combinations
-    of all characters between fractured substrings should match the total distribution
-    of matching characters between str1 and str2
+
         
 
 ----------------------------------------------------------------------------------------*/
@@ -38,6 +40,7 @@ adjusted_fss_score
 #define INCLUDE_GUARD_FSS_SCORE
 
 #include <stdbool.h>
+#include <string.h>
 
 #include "../components/calc_groups.h"
 #include "../components/utility_functions.h"
@@ -66,9 +69,8 @@ double fss_score(char* str1, char* str2)
     int valid_i;                    // i within idx_ref to use if no matches found
 
 
-
-    int basis_code = choose_fss_basis(str1, str2);
     // Swap str1 and str2 if str1 is chosen as the basis 
+    int basis_code = choose_fss_basis(str1, str2);
     if (basis_code == 0)
     {
         char* temp = str1;
@@ -149,7 +151,6 @@ double fss_score(char* str1, char* str2)
 
     return to_return;
 }
-
 
 
 // Assigns x points per character-to-character match within each fractured substring,
@@ -279,5 +280,109 @@ double adjusted_fss_score(char* str1, char* str2)
     return to_return;
 }
 
+// Utilizes naive method to identify fractured substring matches. Score as fss_score
+// does with a different algorithm (On3)
+double naive_fss_score(char* str1, char* str2)
+{
+    int idx1, idx2;
+    int sub_idx1, sub_idx2;
+    char chr1, chr2;
+    int len1, len2;
+
+    int total_score = 0;
+    bool firstpass;
+
+    // Swap strings to ensure proper order
+    if (choose_fss_basis(str1, str2) == 0)
+    {
+        char* temp = str1;
+        str1 = str2;
+        str2 = temp;
+    }
+
+    len1 = strlen(str1);
+    len2 = strlen(str2);
+
+    // Early exit conditions based on edge cases
+    if (len1 == 0 && len2 == 0)
+        return 1;
+    else if ((len1 == 0) != (len2 == 0))
+        return 0;
+    // No fragmented substrings when one string is one long
+    else if (len1 == 1)
+    {
+        for (idx2 = 0; idx2 < len2; idx2++)
+            if (*str1 == *(str2 + idx2)) return 1;
+        return 0;
+    }
+    else if (len2 == 1)
+    {
+        for (idx1 = 0; idx1 < len1; idx1++)
+            if (*(str1 + idx1) == *str2) return 1;
+        return 0;
+    }
+
+    char copy1[len1];
+    char copy2[len2];
+
+    // Make copies since we'll be "crossing off" characters by overwriting them with '\0'
+    strcpy(copy1, str1);
+    strcpy(copy2, str2);
+
+    idx1 = 0;
+    idx2 = 0;
+    do
+    {
+        idx1 = 0;
+        idx2 = 0;
+        firstpass = true;
+
+        // Initialize idx1 and idx2 to the first non-crossed-off character
+        while (*(copy1 + idx1) == '\0' && idx1 < len1)
+            idx1++;
+
+        while (*(copy2 + idx2) == '\0' && idx2 < len2)
+            idx2++;
+
+        sub_idx1 = idx1;
+        sub_idx2 = idx2;
+
+        while (sub_idx1 < len1)
+        {
+            if (sub_idx2 == len2)
+            {
+                // Set str1 index to next available character (or end of string)
+                do {sub_idx1++;} while (*(copy1 + sub_idx1) == '\0' && sub_idx1 < len1);
+                sub_idx2 = idx2;
+            }
+            else if (*(copy1 + sub_idx1) == *(copy2 + sub_idx2))
+            {
+                // Don't add a point if this is the first char match in this pass
+                total_score += !firstpass;
+                firstpass = false;
+
+                // Cross off these characters since we've used them
+                *(copy1 + sub_idx1) = '\0';
+                *(copy2 + sub_idx2) = '\0';
+
+                // Set indices to next available character (or end of string)
+                do {sub_idx1++;} while (*(copy1 + sub_idx1) == '\0' && sub_idx1 < len1);
+                do {sub_idx2++;} while (*(copy2 + sub_idx2) == '\0' && sub_idx2 < len2);
+
+                // Move our reference indices to match
+                idx1 = sub_idx1;
+                idx2 = sub_idx2;
+
+            } else
+            {
+                do {sub_idx2++;} while (*(copy2 + sub_idx2) == '\0' && sub_idx2 < len2);
+            }
+        }
+
+        // Exit if we've traversed all of str1 without a match
+    } while (!firstpass);
+
+    return total_score / (double)(len1 - 1);
+} 
 
 #endif

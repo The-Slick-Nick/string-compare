@@ -49,12 +49,14 @@ SUBTEST TEMPLATES
 void exact_equality_test(double(*compare_func)())
 {
     char* test_str;
+    double score;
     for (int i = 0; i < 100; i++)
     {
         test_str = random_string();
-        if (compare_func(test_str, test_str) != 1.0)
+        score = compare_func(test_str, test_str);
+        if (score != 1.0)
         {
-            TEST_FAIL_FMT("Equality test failed on string %s", test_str);
+            TEST_FAIL_FMT("Equality test failed: %f \n      %s", score, test_str);
             free(test_str);
             return;
         }
