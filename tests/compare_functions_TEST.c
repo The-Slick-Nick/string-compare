@@ -118,5 +118,7 @@ int main()
     ADD_CASE(test_cdist_score, "cdist_score");
     ADD_CASE(test_lcs_score, "lcs_score");
     ADD_CASE(test_improved_lcs_score, "improved_lcs_score");
+    ADD_CASE(test_fss_score, "fss_score");
+    ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
     EWENIT_END;
 }

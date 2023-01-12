@@ -54,7 +54,7 @@ void exact_equality_test(double(*compare_func)())
         test_str = random_string();
         if (compare_func(test_str, test_str) != 1.0)
         {
-            TEST_FAIL_FMT("Equality test failed on string%s", test_str);
+            TEST_FAIL_FMT("Equality test failed on string %s", test_str);
             free(test_str);
             return;
         }

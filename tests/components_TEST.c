@@ -219,13 +219,39 @@ void test_choose_fss_basis()
 
 }
 
+/*=======================================================================================
+summarize_string
+========================================================================================*/
+void test_summarize_string()
+{
+    int char_counts[256] = {0};
+    int* idx_ref[256] = {NULL};
+    int len;
+
+    len = summarize_string("HELLO", char_counts, idx_ref);
+
+    // Check length
+    ASSERT_EQUAL_INT(len, 5);
+    // check char_counts
+    ASSERT_EQUAL_INT(char_counts['H'], 1);
+    ASSERT_EQUAL_INT(char_counts['E'], 1);
+    ASSERT_EQUAL_INT(char_counts['L'], 2);
+    ASSERT_EQUAL_INT(char_counts['O'], 1);
+    // check idx_ref
+    ASSERT_EQUAL_INT(*(idx_ref['H'] + 0), 0);
+    ASSERT_EQUAL_INT(*(idx_ref['E'] + 0), 1);
+    ASSERT_EQUAL_INT(*(idx_ref['L'] + 0), 2);
+    ASSERT_EQUAL_INT(*(idx_ref['L'] + 1), 3);
+    ASSERT_EQUAL_INT(*(idx_ref['O'] + 0), 4);
 
 
+}
 
 int main()
 {
     EWENIT_START;
     ADD_CASE(test_choose_fss_basis, "fss_basis");
+    ADD_CASE(test_summarize_string, "summarize_string");
 
     ADD_CASE(test_calc_groups_ADDBEST_IDX2REPLACE, "CG addBest IDX2_REPLACE");
     ADD_CASE(test_calc_groups_ADDBEST_IDX2SECONDMIN, "CG addBest IDX2_NEWELEM");
@@ -238,5 +264,6 @@ int main()
     ADD_CASE(test_calc_groups_ADDFIRST_IDX2SECONDMIN, "CG addFirst secondmin idx2_min");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATESECOND, "CG addFirst updates second");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATEFIRST, "CG addFirst updates first");
+
     EWENIT_END_COMPACT;
 }

@@ -2,6 +2,8 @@
 utility_functions.h
 
 Helpful subfunctions for compare_functions
+    choose_fss_basis
+    build_
 ----------------------------------------------------------------------------------------*/
 #include <stdbool.h>
 #include <assert.h>
@@ -61,4 +63,68 @@ int choose_fss_basis(char* str1, char* str2)
 
     // Return value should be identified in loop - return an oopsie if we get here
     return -1;
+}
+
+
+// summarize_str - Model a provided string, providing:
+// 1 - A char_count array tracking the number of occurences of each character
+// 2 - An idx_ref storing each index a character appears at, by character
+// 3 - The length of the string, as function's return value
+// Example:
+// HELLO
+// idx      char_counts     idx_ref
+// 69 (E)       1           [1]               
+// 72 (H)       1           [0]    
+// 76 (L)       2           [2, 3]
+// 79 (O)       1           [4]
+// Params
+// ------
+//  char* str
+//      Pointer to input string to model
+//  int* char_counts
+//      Pointer to a 256-sized integer array to build char_counts into
+//      Should be initialized to zeroes
+//  int** idx_ref
+//      Pointer to a 256-sized array of integer array pointers to build
+//      idx_ref into. Should be initialized to NULLs
+//  Returns
+//  -------
+//  int
+//      Length of input string `str` as an integer
+int summarize_string(const char* str, int* char_counts, int** idx_ref)
+{
+    int idx;                    // Index for looping through str
+    char chr;                   // Current character in str in a loop
+    int chr_count;              // Current count for a character in loop
+    int min_indices[256] = {0}; // Indices for idx_ref to write to for each char
+    int min_idx;                // In a loop, index to write into idx_ref for current char
+    int len = 0;                // Tabulated length of string
+
+    // First build char_counts
+    for (idx = 0; *(str + idx) != '\0'; idx++)
+    {
+        chr = *(str + idx);
+        len++;
+
+        char_counts[chr]++;
+        // *(char_counts + chr)++;
+    }
+
+    for (idx = 0; *(str + idx) != '\0'; idx++)
+    {
+        chr = *(str + idx);
+        chr_count = char_counts[chr];
+        min_idx = min_indices[chr];
+
+        // Allocate memory for this part of idx_ref if we haven't yet
+        if ( idx_ref[chr] == NULL)
+            idx_ref[chr] = (int*)malloc(chr_count * sizeof(int));
+
+        // Add this index to idx_ref
+
+        // idx_ref[chr][min_idx] = idx;
+        *(idx_ref[chr] + min_idx) = idx;
+        min_indices[chr]++;
+    }
+    return len;
 }
