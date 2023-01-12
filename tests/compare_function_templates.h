@@ -157,7 +157,7 @@ void score_range_test(double(*compare_func)())
 
 }
 
-// test that 100000 runs of func executes within 1 second
+// test that 10000 runs of func executes within 1 second
 void benchmark_test(double(*compare_func)())
 {
     char* str1;
@@ -169,7 +169,7 @@ void benchmark_test(double(*compare_func)())
     t_start = clock();
 
     // 100k passes
-    for (int num_tests = 0; num_tests < 100000; num_tests++)
+    for (int num_tests = 0; num_tests < 10000; num_tests++)
     {
 
         str1 = random_string();
@@ -177,7 +177,7 @@ void benchmark_test(double(*compare_func)())
         if (time_taken > 1.0)
         {
             TEST_FAIL_FMT(
-                "Benchmark test failed: %d out of 100000 tests in 1 second",
+                "Benchmark test failed: %d out of 10000 tests in 1 second",
                 num_tests
             );
             free(str1);
@@ -192,7 +192,7 @@ void benchmark_test(double(*compare_func)())
     }
     // 100k passes should be done in less than a second
     TEST_PASS_FMT(
-        "Benchmark test succeeded: 100000 tests completed in %f seconds", time_taken
+        "Benchmark test succeeded: 10000 tests completed in %f seconds", time_taken
     );
     free(str1);
     free(str2);

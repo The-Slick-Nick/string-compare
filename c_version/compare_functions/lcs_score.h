@@ -14,6 +14,8 @@ to the length of the shorter string
 #include <stdlib.h>
 #include <string.h>
 
+#include "../components/utility_functions.h"
+
 // Longest Common Substring score
 double lcs_score(const char* str1, const char* str2)
 {
@@ -102,44 +104,14 @@ double improved_lcs_score(const char* str1, const char* str2)
 
     int char_counts[256] = {0};     // Counts of characters in str2 by their ascii val
     int* idx_ref[256] = {NULL};     // Arrays of each index found in str2 by char
-    int min_indices[256] = {0};     // Index for idx_ref to write to - matched by index
-    int min_idx;
 
-
-    // Loop through str2 once to get counts of all characters
-    len2 = 0;
-    for (idx2 = 0; *(str2 + idx2) != '\0'; idx2++)
-    {
-        len2++;
-        char_counts[ *(str2 + idx2) ]++;
-    }
+    // Build our arrays for use in algorithm
+    len2 = summarize_string(str2, char_counts, idx_ref);
     len1 = strlen(str1);
 
-    // Early exit conditions
-
-    // Exactly one length == 0 - score 0
+    // Exactly one blank - exit early, 0 score
     if ( (len1 == 0) != (len2 == 0))
         return 0;
-
-    // Loop through str2 again to build its index reference
-    int chr2_count;
-    for (idx2 = 0; *(str2 + idx2) != '\0'; idx2++)
-    {
-        chr2 = *(str2 + idx2);              // Current character
-        chr2_count = char_counts[chr2];     // Number of this char in str2
-        min_idx = min_indices[chr2];        // Current index to write to in idx_ref
-
-        // Allocate memory for str2 index array we haven't yet
-        if (idx_ref[chr2] == NULL)
-        {
-            idx_ref[chr2] = (int*)malloc(chr2_count * sizeof(int));
-        }
-
-        // Add idx2 to this character's reference - update to-write-to index
-        *(idx_ref[chr2] + min_idx) = idx2;
-        min_indices[chr2]++;
-    }
-
 
     // Loop through str1 and match indices to str2
     max_substr_score = 0;
@@ -184,7 +156,6 @@ double improved_lcs_score(const char* str1, const char* str2)
                 max_substr_score = substr_score;
         }
     }
-
 
     // Now free our allocated memory
     for (int i = 0; i < 256; i++)
