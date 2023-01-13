@@ -43,6 +43,7 @@ _calcitem* _calcitem_init(int idx1, int idx2)
     item->idx1 = idx1;
     item->idx2 = idx2;
     item->next = NULL;
+    return item;
 }
 
 CalcGroup* CalcGroup_init()
