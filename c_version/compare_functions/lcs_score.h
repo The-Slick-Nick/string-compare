@@ -86,9 +86,9 @@ double lcs_score(const char* str1, const char* str2)
     // Return ratio of longest substr length to the short string (which would be the
     // maximum length substring possible)
     if (len1 > len2)
-        return max_substr_score / (float)len2;
+        return max_substr_score / (double)len2;
     else
-        return max_substr_score / (float)len1;
+        return max_substr_score / (double)len1;
 
 }
 

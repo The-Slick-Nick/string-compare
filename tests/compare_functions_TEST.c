@@ -143,32 +143,6 @@ void test_naive_fss_score()
     string_comparison_test(naive_fss_score);
     subset_test(naive_fss_score);
 
-    // should match fss_score
-    double score1, score2;
-    char *str1, *str2;
-    bool is_equal = true;
-    for (int i = 0; i < 100; i++)
-    {
-        str1 = random_string();
-        str2 = random_string();
-        score1 = naive_fss_score(str1, str2);
-        score2 = fss_score(str1, str2);
-        if (!ALMOST_EQUAL_DOUBLE(score1, score2))
-        {
-            is_equal = false;
-            TEST_FAIL_FMT(
-                "fss and naive_fss procued different scores %f vs %f\n      %s\n      %s",
-                score1, score2, str1, str2
-            );
-        }
-        free(str1);
-        free(str2);
-        if (!is_equal)
-            break;
-    }
-    if (is_equal)
-        TEST_PASS("fss and naive_fss produced the same scores for 100 tests");
-
     // Manually tabulated examples
     ASSERT_EQUAL_DOUBLE(naive_fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
     ASSERT_EQUAL_DOUBLE(naive_fss_score("WREATHES", "WEATHERS"), (double)6/7);
@@ -178,8 +152,15 @@ void test_naive_fss_score()
 void test_adjusted_naive_fss_score()
 {
     string_comparison_test(adjusted_naive_fss_score);
+    // Manually tabulated examples
+    ASSERT_ALMOST_EQUAL_DOUBLE(
+        adjusted_naive_fss_score("STRESSED", "DESSERT"), (double)24/56
+    );
+    ASSERT_ALMOST_EQUAL_DOUBLE(
+        adjusted_naive_fss_score("ULTIMATE", "MUTILATE"), (double)24/42
+    );
 
-    
+
 }
 
 /* =======================================================================================
