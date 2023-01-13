@@ -13,13 +13,13 @@ Tests on string comparison methods
 ========================================================================================*/
 
 #include "../EWENIT/EWENIT/EWENIT.c"
-#include "test_utils\random_string.h"
-#include "compare_function_templates.h"
+#include "test_utils/random_string.h"
+#include "test_utils/compare_function_templates.h"
 
-#include "../c_version/compare_functions/cdist_score.h"
-#include "../c_version/compare_functions/lcs_score.h"
-#include "../c_version/compare_functions/fss_score.h"
-#include "../c_version/compare_functions/levenshtein_score.h"
+#include "../strcompare/compare_functions/cdist_score.h"
+#include "../strcompare/compare_functions/lcs_score.h"
+#include "../strcompare/compare_functions/fss_score.h"
+#include "../strcompare/compare_functions/levenshtein_score.h"
 
 #include <time.h>
 #include <stdbool.h>
