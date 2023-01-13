@@ -15,7 +15,7 @@ Helpful subfunctions for compare_functions
 // Identifies which of two strings is more appropriate to be the basis (idx map built from
 // for a fss_score calculation)
 // Returns 0 for first string, 1 for second string
-int choose_fss_basis(char* str1, char* str2)
+int choose_fss_basis(const char* str1, const char* str2)
 {
     int idx1, idx2;
     char chr1, chr2;

@@ -161,7 +161,7 @@ double fss_score(char* str1, char* str2)
 // Tabulated score is then divided by the maximum possible score z, where
 // z = (len(longer_string) - 2) * (len(shorter_string) - 1)
 // The adjusted_fss_score is then calculated as sum(x - y) / z
-double adjusted_fss_score(char* str1, char* str2)
+double adjusted_fss_score(const char* str1, const char* str2)
 {
     // General variables
     int* idx_ref[256] = {NULL};     // reference of each str2 index for each str1 char
@@ -184,7 +184,7 @@ double adjusted_fss_score(char* str1, char* str2)
     int basis_code = choose_fss_basis(str1, str2);
     if (basis_code == 0)
     {
-        char* temp = str1;
+        const char* temp = str1;
         str1 = str2;
         str2 = temp;
     }
@@ -282,7 +282,7 @@ double adjusted_fss_score(char* str1, char* str2)
 
 // Utilizes naive method to identify fractured substring matches. Score as fss_score
 // does with a different algorithm (On3)
-double naive_fss_score(char* str1, char* str2)
+double naive_fss_score(const char* str1, const char* str2)
 {
     int idx1, idx2;
     int sub_idx1, sub_idx2;
@@ -295,7 +295,7 @@ double naive_fss_score(char* str1, char* str2)
     // Swap strings to ensure proper order
     if (choose_fss_basis(str1, str2) == 0)
     {
-        char* temp = str1;
+        const char* temp = str1;
         str1 = str2;
         str2 = temp;
     }
