@@ -1,16 +1,17 @@
 /*----------------------------------------------------------------------------------------
 calc_groups.h
 
-For use with methods fss_score methods
+For use with method fss_score methods
 
 Calc group - stores a linked list of items representing character matches between
 str1 and str2.
 
-Each item in a CalcGroup represents a matching 
+Each item in a CalcGroup represents a running substring whose relative order is common
+between str1 and str2.
 
 New potential character matches between one string and another are assessed against
 each item in the CalcGroup, appending to an existing if both indices are higher
-than on
+than the _calcitem representing that group.
 ----------------------------------------------------------------------------------------*/
 
 
