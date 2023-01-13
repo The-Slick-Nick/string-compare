@@ -174,6 +174,14 @@ void test_naive_fss_score()
     ASSERT_EQUAL_DOUBLE(naive_fss_score("WREATHES", "WEATHERS"), (double)6/7);
 }
 
+
+void test_adjusted_naive_fss_score()
+{
+    string_comparison_test(adjusted_naive_fss_score);
+
+    
+}
+
 /* =======================================================================================
 MAIN
 ========================================================================================*/
@@ -187,5 +195,6 @@ int main()
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
     ADD_CASE(test_naive_fss_score, "naive fss score");
+    ADD_CASE(test_adjusted_naive_fss_score, "naive adjusted fss score");
     EWENIT_END;
 }

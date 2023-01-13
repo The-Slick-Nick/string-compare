@@ -349,6 +349,114 @@ double naive_fss_score(char* str1, char* str2)
 
         while (sub_idx1 < len1)
         {
+            if (idx2 == len2)  // Shortcut if we've matched to the final str2 character
+                break;
+            else if (sub_idx2 == len2)
+            {
+                // Set str1 index to next available character (or end of string)
+                do {sub_idx1++;} while (*(copy1 + sub_idx1) == '\0' && sub_idx1 < len1);
+                sub_idx2 = idx2;
+            }
+            else if (*(copy1 + sub_idx1) == *(copy2 + sub_idx2))
+            {
+                // Don't add a point if this is the first char match in this pass
+                total_score += !firstpass;
+                firstpass = false;
+
+                // Cross off these characters since we've used them
+                *(copy1 + sub_idx1) = '\0';
+                *(copy2 + sub_idx2) = '\0';
+
+                // Set indices to next available character (or end of string)
+                do {sub_idx1++;} while (*(copy1 + sub_idx1) == '\0' && sub_idx1 < len1);
+                do {sub_idx2++;} while (*(copy2 + sub_idx2) == '\0' && sub_idx2 < len2);
+
+                // Move our reference indices to match
+                idx1 = sub_idx1;
+                idx2 = sub_idx2;
+
+            } else
+            {
+                do {sub_idx2++;} while (*(copy2 + sub_idx2) == '\0' && sub_idx2 < len2);
+            }
+        }
+
+        // Exit if we've traversed all of str1 without a match
+    } while (!firstpass);
+
+    return total_score / (double)(len1 - 1);
+}
+
+
+// Applies the scoring method from adjusted_fss_score and the fragmented substring
+// finding algorithm from naive_fss_score.
+double adjusted_naive_fss_score(const char* str1, const char* str2)
+{
+    int idx1, idx2;
+    int sub_idx1, sub_idx2;
+    char chr1, chr2;
+    int len1, len2;
+
+    int total_score = 0;
+    bool firstpass;
+
+    // Swap strings to ensure proper order
+    if (choose_fss_basis(str1, str2) == 0)
+    {
+        const char* temp = str1;
+        str1 = str2;
+        str2 = temp;
+    }
+
+    len1 = strlen(str1);
+    len2 = strlen(str2);
+
+    // Early exit conditions based on edge cases
+    if (len1 == 0 && len2 == 0)
+        return 1;
+    else if ((len1 == 0) != (len2 == 0))
+        return 0;
+    // No fragmented substrings when one string is one long
+    else if (len1 == 1)
+    {
+        for (idx2 = 0; idx2 < len2; idx2++)
+            if (*str1 == *(str2 + idx2)) return 1;
+        return 0;
+    }
+    else if (len2 == 1)
+    {
+        for (idx1 = 0; idx1 < len1; idx1++)
+            if (*(str1 + idx1) == *str2) return 1;
+        return 0;
+    }
+
+    char copy1[len1 + 1];
+    char copy2[len2 + 1];
+
+    // Make copies since we'll be "crossing off" characters by overwriting them with '\0'
+    strcpy(copy1, str1);
+    strcpy(copy2, str2);
+
+    idx1 = 0;
+    idx2 = 0;
+    do
+    {
+        idx1 = 0;
+        idx2 = 0;
+        firstpass = true;
+
+        // Initialize idx1 and idx2 to the first non-crossed-off character
+        while (*(copy1 + idx1) == '\0' && idx1 < len1)
+            idx1++;
+
+        while (*(copy2 + idx2) == '\0' && idx2 < len2)
+            idx2++;
+
+        sub_idx1 = idx1;
+        sub_idx2 = idx2;
+
+        while (sub_idx1 < len1)
+        {
             if (sub_idx2 == len2)
             {
                 // Set str1 index to next available character (or end of string)
@@ -383,6 +491,6 @@ double naive_fss_score(char* str1, char* str2)
     } while (!firstpass);
 
     return total_score / (double)(len1 - 1);
-} 
+}
 
 #endif
