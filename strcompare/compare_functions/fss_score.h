@@ -41,6 +41,7 @@ adjusted_fss_score
 
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "../components/calc_groups.h"
 #include "../components/utility_functions.h"

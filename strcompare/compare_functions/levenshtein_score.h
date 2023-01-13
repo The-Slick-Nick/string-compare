@@ -8,6 +8,8 @@ Final score is
 (length of longest string - levenshtein distance) / (length of longest string)
 ----------------------------------------------------------------------------------------*/
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define MIN_OF_TWO(a, b)        (a > b ? b : a)
 #define MIN_OF_THREE(a, b, c)   MIN_OF_TWO(MIN_OF_TWO(a, b), c)
@@ -83,10 +85,10 @@ double levenshtein_score(const char* str1, const char* str2)
         }
     }
 
-    free(score_matrix);
-
     // Levenshtein distance is final element in array 
     int distance = *(score_matrix + (arr_len2 * str_len1) + str_len2);
+    free(score_matrix);
+
     // Correct/adjust score based on the longest string
     if (str_len1 > str_len2)
         return (str_len1 - distance) / (double)str_len1;
