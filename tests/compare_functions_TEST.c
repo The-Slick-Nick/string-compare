@@ -11,7 +11,7 @@ Tests on string comparison methods
     adjusted_naive_fss_score
 ========================================================================================*/
 
-#include "../../EWENIT/EWENIT/EWENIT.c"
+#include "../EWENIT/EWENIT/EWENIT.c"
 #include "test_utils\random_string.h"
 #include "compare_function_templates.h"
 
