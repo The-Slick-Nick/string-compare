@@ -322,9 +322,8 @@ double naive_fss_score(const char* str1, const char* str2)
         return 0;
     }
 
-    /* FIX - OTHER COMPILER DOESN'T LIKE THIS */
-    char copy1[len1 + 1];
-    char copy2[len2 + 1];
+    char* copy1 = (char*)malloc((len1 + 1) * sizeof(char));
+    char* copy2 = (char*)malloc((len2 + 1) * sizeof(char));
 
     // Make copies since we'll be "crossing off" characters by overwriting them with '\0'
     strcpy(copy1, str1);
@@ -385,6 +384,8 @@ double naive_fss_score(const char* str1, const char* str2)
         // Exit if we've traversed all of str1 without a match
     } while (!firstpass);
 
+    free(copy1);
+    free(copy2);
     return total_score / (double)(len1 - 1);
 }
 
@@ -440,9 +441,8 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
         return (double)shortscore/2;
     }
 
-    /* FIX - OTHER COMPILER DOESN'T LIKE THIS */
-    char copy1[len1 + 1];
-    char copy2[len2 + 1];
+    char* copy1 = (char*)malloc((len1 + 1) * sizeof(char));
+    char* copy2 = (char*)malloc((len2 + 1) * sizeof(char));
 
     // Make copies since we'll be "crossing off" characters by overwriting them with '\0'
     strcpy(copy1, str1);
@@ -507,6 +507,8 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
         // Exit if we've traversed all of str1 without a match
     } while (!firstpass);
 
+    free(copy1);
+    free(copy2);
     return total_score / (double)( (len2 - 2) * (len1 - 1) );
 }
 
