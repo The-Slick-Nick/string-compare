@@ -397,6 +397,7 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
     char chr1, chr2;
     int len1, len2;
 
+    int osdiff;
     int total_score = 0;
     bool firstpass;
 
@@ -428,6 +429,14 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
         for (idx1 = 0; idx1 < len1; idx1++)
             if (*(str1 + idx1) == *str2) return 1;
         return 0;
+    }
+    else if (len2 < 3)
+    {
+        // Only encountered here when len1 == len2 == 2, all others are accounted for
+        int shortscore = 0;
+        shortscore += (*(str1 + 1) == *(str2 + 1));
+        shortscore += (*str2 == *str1);
+        return (double)shortscore/2;
     }
 
     char copy1[len1 + 1];
@@ -465,21 +474,27 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
             }
             else if (*(copy1 + sub_idx1) == *(copy2 + sub_idx2))
             {
-                // Don't add a point if this is the first char match in this pass
-                total_score += !firstpass;
-                firstpass = false;
+                // Don't add points if this is our first match
+                if (!firstpass)
+                {
+                    osdiff = abs( (sub_idx2 - idx2) - (sub_idx1 - idx1) );
+                    total_score += ( (len2 - 2) - osdiff);
+                }
+                else
+                    firstpass = false;
 
                 // Cross off these characters since we've used them
                 *(copy1 + sub_idx1) = '\0';
                 *(copy2 + sub_idx2) = '\0';
 
+                // Move basis indices to remember last found match
+                idx1 = sub_idx1;
+                idx2 = sub_idx2;
+
                 // Set indices to next available character (or end of string)
                 do {sub_idx1++;} while (*(copy1 + sub_idx1) == '\0' && sub_idx1 < len1);
                 do {sub_idx2++;} while (*(copy2 + sub_idx2) == '\0' && sub_idx2 < len2);
 
-                // Move our reference indices to match
-                idx1 = sub_idx1;
-                idx2 = sub_idx2;
 
             } else
             {
@@ -490,7 +505,7 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
         // Exit if we've traversed all of str1 without a match
     } while (!firstpass);
 
-    return total_score / (double)(len1 - 1);
+    return total_score / (double)( (len2 - 2) * (len1 - 1) );
 }
 
 #endif

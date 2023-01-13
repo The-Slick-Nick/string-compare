@@ -154,7 +154,7 @@ void test_adjusted_naive_fss_score()
     string_comparison_test(adjusted_naive_fss_score);
     // Manually tabulated examples
     ASSERT_ALMOST_EQUAL_DOUBLE(
-        adjusted_naive_fss_score("STRESSED", "DESSERT"), (double)24/56
+        adjusted_naive_fss_score("STRESSED", "DESSERT"), (double)18/36
     );
     ASSERT_ALMOST_EQUAL_DOUBLE(
         adjusted_naive_fss_score("ULTIMATE", "MUTILATE"), (double)24/42
