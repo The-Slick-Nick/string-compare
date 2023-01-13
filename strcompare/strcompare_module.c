@@ -202,7 +202,7 @@ Define module initialization function
 ========================================================================================*/
 
 
-PyMODINIT_FUNCT PyInit_strcompare(void)
+PyMODINIT_FUNC PyInit_strcompare(void)
 {
     return PyModule_Create(&strcompare_module);
 }
