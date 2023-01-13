@@ -62,6 +62,7 @@ double levenshtein_score(const char* str1, const char* str2)
 
             cost = (*(str1 + str_idx1) != *(str2 + str_idx2));
 
+            // Identify the lowest cost transformation for this cell
             score_matrix[arr_idx1][arr_idx2] = MIN_OF_THREE(
                 1 + score_matrix[arr_idx1][arr_idx2 - 1],
                 1 + score_matrix[arr_idx1 - 1][arr_idx2],

@@ -1,6 +1,7 @@
 .vscode
 test_main.exe
 .venv
+venv
 __pycache__
 build
 dist
