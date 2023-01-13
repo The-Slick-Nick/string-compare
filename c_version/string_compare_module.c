@@ -226,6 +226,26 @@ of how similar the two strings are.
     );
 }
 
+/*
+to include:
+cdist_score.h
+    cdist_score
+
+fss_score.h
+    fss_score
+    adjusted_fss_score
+    naive_fss_score
+    adjusted_naive_fss_score
+
+lcs_score.h
+    lcs_score
+    improved_lcs_score
+
+levenshtein_score.h
+    levenshtein_score
+
+*/
+
 
 // WRAP FUNCTIONS FOR USE IN PYTHON
 

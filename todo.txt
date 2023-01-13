@@ -1,8 +1,0 @@
-Add a subtest template for SUBSTRINGS being equal
-(i.e. func(123ABC456, ABC) == 1) but DON'T put it in standard template
-(for use on algorithms that SHOULD return 1 when one is a subset of the other)
-
-Change benchmark_test
-* Instead of running all 100k tests and checking the time, instead check the time every
-  loop and fail when time > 1 sec. On failure, report on the number of passes it managed
-  to get through.
