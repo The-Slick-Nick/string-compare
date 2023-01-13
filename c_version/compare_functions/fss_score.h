@@ -322,8 +322,8 @@ double naive_fss_score(char* str1, char* str2)
         return 0;
     }
 
-    char copy1[len1];
-    char copy2[len2];
+    char copy1[len1 + 1];
+    char copy2[len2 + 1];
 
     // Make copies since we'll be "crossing off" characters by overwriting them with '\0'
     strcpy(copy1, str1);
