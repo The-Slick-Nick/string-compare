@@ -5,7 +5,7 @@ Tests on helper components for comparison methods to ensure they work correctly
 ========================================================================================*/
 #include <stdbool.h>
 
-#include "../../EWENIT/EWENIT/EWENIT.c"
+#include "../EWENIT/EWENIT/EWENIT.c"
 #include "../c_version/components/calc_groups.h"
 #include "../c_version/components/utility_functions.h"
 

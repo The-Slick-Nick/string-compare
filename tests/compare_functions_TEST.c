@@ -9,6 +9,7 @@ Tests on string comparison methods
     adjusted_fss_score
     naive_fss_score
     adjusted_naive_fss_score
+    levenshtein_score
 ========================================================================================*/
 
 #include "../EWENIT/EWENIT/EWENIT.c"
