@@ -322,6 +322,7 @@ double naive_fss_score(const char* str1, const char* str2)
         return 0;
     }
 
+    /* FIX - OTHER COMPILER DOESN'T LIKE THIS */
     char copy1[len1 + 1];
     char copy2[len2 + 1];
 
@@ -439,6 +440,7 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
         return (double)shortscore/2;
     }
 
+    /* FIX - OTHER COMPILER DOESN'T LIKE THIS */
     char copy1[len1 + 1];
     char copy2[len2 + 1];
 

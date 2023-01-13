@@ -45,6 +45,8 @@ double levenshtein_score(const char* str1, const char* str2)
     arr_len1 = str_len1 + 1;    // Length of array in x dimension
     arr_len2 = str_len2 + 1;    // Length of array in y dimension
 
+
+    /* FIX - OTHER COMPILER DOESN'T LIKE THIS */
     int score_matrix[arr_len1][arr_len2];
 
     for (arr_idx1 = 0; arr_idx1 < arr_len1; arr_idx1++)
