@@ -194,7 +194,7 @@ static struct PyModuleDef strcompare_module = {
     "Methods to assess string similarity",
     -1,
     strcompare_methods
-}
+};
 
 
 /*========================================================================================
