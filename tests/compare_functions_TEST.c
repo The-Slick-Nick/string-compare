@@ -5,6 +5,10 @@ Tests on string comparison methods
     cdist_score
     lcs_score
     improved_lcs_score
+    fss_score
+    adjusted_fss_score
+    naive_fss_score
+    adjusted_naive_fss_score
 ========================================================================================*/
 
 #include "../../EWENIT/EWENIT/EWENIT.c"
@@ -14,6 +18,7 @@ Tests on string comparison methods
 #include "../c_version/compare_functions/cdist_score.h"
 #include "../c_version/compare_functions/lcs_score.h"
 #include "../c_version/compare_functions/fss_score.h"
+#include "../c_version/compare_functions/levenshtein_score.h"
 
 #include <time.h>
 #include <stdbool.h>
@@ -163,6 +168,15 @@ void test_adjusted_naive_fss_score()
 
 }
 
+void test_levenshtein_score()
+{
+    string_comparison_test(levenshtein_score);
+    // Manually tabulated examples
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("GUMBO", "GAMBOL"), (double)4/6);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("KITTEN", "SITTING"), (double)4/7);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("STRESSED", "DESSERT"), (double)3/8);
+}
+
 /* =======================================================================================
 MAIN
 ========================================================================================*/
@@ -176,6 +190,7 @@ int main()
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
     ADD_CASE(test_naive_fss_score, "naive fss score");
-    ADD_CASE(test_adjusted_naive_fss_score, "naive adjusted fss score");
+    ADD_CASE(test_adjusted_naive_fss_score, "adjusted naive fss score");
+    ADD_CASE(test_levenshtein_score, "levenshtein score");
     EWENIT_END;
 }

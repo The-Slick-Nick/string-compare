@@ -50,7 +50,7 @@ void exact_equality_test(double(*compare_func)())
 {
     char* test_str;
     double score;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         test_str = random_string();
         score = compare_func(test_str, test_str);
@@ -61,7 +61,7 @@ void exact_equality_test(double(*compare_func)())
             return;
         }
     }
-    TEST_PASS("Equality test passed for all 100 tests");
+    TEST_PASS("Equality test passed for all 1,000 tests");
 }
 
 // test that func(str1, str2) == func(str2, str1)
@@ -71,7 +71,7 @@ void reversibility_test(double(*compare_func)())
     char* str2;
     double score1;
     double score2;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         str1 = random_string();
         str2 = random_string();
@@ -87,7 +87,7 @@ void reversibility_test(double(*compare_func)())
     }
     free(str1);
     free(str2);
-    TEST_PASS("Reversibility test passed for all 100 tests");
+    TEST_PASS("Reversibility test passed for all 1,000 tests");
 }
 
 // Test that func(str1, str2) == 0.0 if str1 and str2 share 0 characters
@@ -95,7 +95,7 @@ void inequality_test(double(*compare_func)())
 {
     char* str1;
     char* str2;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         str1 = random_string_charset(CHARSET_NUMBERS);
         str2 = random_string_charset(CHARSET_UPPERCASE);
@@ -109,7 +109,7 @@ void inequality_test(double(*compare_func)())
     }
     free(str1);
     free(str2);
-    TEST_PASS("Inequality test passed for all 100 tests");
+    TEST_PASS("Inequality test passed for all 1,000 tests");
 }
 
 // test that func(str1, "") == 0 for any str1 != ""
@@ -129,7 +129,7 @@ void one_empty_test(double(*compare_func)())
         }
     }
     free(str1);
-    TEST_PASS("Empty string test passed for all 100 tests");
+    TEST_PASS("Empty string test passed for all 1,000 tests");
 }
 
 // test that 0.0 <= func(str1, str2) <= 1.0 for any valid str1, str2
@@ -138,7 +138,7 @@ void score_range_test(double(*compare_func)())
     char* str1;
     char* str2;
     double score;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         str1 = random_string();
         str2 = random_string();
@@ -155,7 +155,7 @@ void score_range_test(double(*compare_func)())
     }
     free(str1);
     free(str2);
-    TEST_PASS("Score range met for all 100 tests");
+    TEST_PASS("Score range met for all 1,000 tests");
 
 }
 
@@ -215,7 +215,7 @@ void subset_test(double(*compare_func)())
 
     double score;
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1000; i++)
     {
         substr_type = rand() % 3;
         base_str = random_string();
@@ -252,7 +252,7 @@ void subset_test(double(*compare_func)())
             return;
         }
     }
-    TEST_PASS("Subset test passed on all 100 tests");
+    TEST_PASS("Subset test passed on all 1,000 tests");
     free(base_str);
     free(prefix);
     free(suffix);
