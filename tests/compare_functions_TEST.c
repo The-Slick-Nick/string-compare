@@ -12,7 +12,7 @@ Tests on string comparison methods
     levenshtein_score
 ========================================================================================*/
 
-#include "../EWENIT/EWENIT/EWENIT.c"
+#include "../EWENIT/EWENIT.c"
 #include "test_utils/random_string.h"
 #include "test_utils/compare_function_templates.h"
 
@@ -34,21 +34,21 @@ void test_cdist_score()
     ASSERT_EQUAL_DOUBLE(cdist_score("abcd", "abzz"), 0.5);
 }
 
-void test_lcs_score()
+void test_naive_lcs_score()
 {
-    string_comparison_test(lcs_score);
-    subset_test(lcs_score);
+    string_comparison_test(naive_lcs_score);
+    subset_test(naive_lcs_score);
 
     // Manually tabulated example(s)
-    ASSERT_ALMOST_EQUAL_DOUBLE(lcs_score("dessert", "stressed"), 4/(double)7);
+    ASSERT_ALMOST_EQUAL_DOUBLE(naive_lcs_score("dessert", "stressed"), 4/(double)7);
 }
 
-void test_improved_lcs_score()
+void test_lcs_score()
 {
     // Note these tests should mirror lcs_score - as this one should check the same
     // thins in a more efficient way
-    string_comparison_test(improved_lcs_score);
-    subset_test(improved_lcs_score);
+    string_comparison_test(lcs_score);
+    subset_test(lcs_score);
 
     // Now test that results match lcs score
     char* str1;
@@ -62,12 +62,12 @@ void test_improved_lcs_score()
     {
         str1 = random_string();
         str2 = random_string();
-        score1 = lcs_score(str1, str2);
-        score2 = improved_lcs_score(str1, str2);
+        score1 = naive_lcs_score(str1, str2);
+        score2 = lcs_score(str1, str2);
         if (!ALMOST_EQUAL_DOUBLE(score1, score2))
         {
             TEST_FAIL_FMT(
-                "lcs and improved_lcs differ: %f != %f\n      %s\n      %s",
+                "naive_lcs and lcs differ: %f != %f\n      %s\n      %s",
                 score1, score2, str1, str2
             );
             free(str1);
@@ -95,12 +95,12 @@ void test_improved_lcs_score()
         str1 = random_string();
         str2 = random_string();
         start = clock();
-        lcs_score(str1, str2);
+        naive_lcs_score(str1, str2);
         end = clock();
         lcs_time += TIME_TAKEN;
 
         start = clock();
-        improved_lcs_score(str1, str2);
+        lcs_score(str1, str2);
         end = clock();
         improved_lcs_time += TIME_TAKEN;
 
@@ -110,14 +110,14 @@ void test_improved_lcs_score()
     if (improved_lcs_time < lcs_time)
     {
         TEST_PASS_FMT(
-            "improved_lcs performed faster than lcs over 100k tests: %f < %f",
+            "lcs performed faster than naive_lcs over 100k tests: %f < %f",
             improved_lcs_time, lcs_time
         );
     }
     else
     {
         TEST_FAIL_FMT(
-            "improved_lcs performed slower than lcs over 100k tests: %f > %f",
+            "lcs performed slower than naive_lcs over 100k tests: %f > %f",
             improved_lcs_time, lcs_time
         );
     }  
@@ -186,8 +186,8 @@ int main()
     srand(time(NULL));  // All subtests use randomization - init here
     EWENIT_START;
     ADD_CASE(test_cdist_score, "cdist_score");
+    ADD_CASE(test_naive_lcs_score, "naive_lcs_score");
     ADD_CASE(test_lcs_score, "lcs_score");
-    ADD_CASE(test_improved_lcs_score, "improved_lcs_score");
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
     ADD_CASE(test_naive_fss_score, "naive fss score");

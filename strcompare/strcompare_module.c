@@ -16,7 +16,7 @@ fss_score.h
 
 lcs_score.h
     lcs_score
-    improved_lcs_score
+    naive_lcs_score
 
 levenshtein_score.h
     levenshtein_score
@@ -105,7 +105,7 @@ static PyObject* method_lcs_score(PyObject* self, PyObject *args)
     return PyFloat_FromDouble(score);
 }
 
-static PyObject* method_improved_lcs_score(PyObject* self, PyObject *args)
+static PyObject* method_naive_lcs_score(PyObject* self, PyObject *args)
 {
     char *str1, *str2;
     double score;
@@ -113,7 +113,7 @@ static PyObject* method_improved_lcs_score(PyObject* self, PyObject *args)
     if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
         return NULL;
 
-    score = improved_lcs_score(str1, str2);
+    score = naive_lcs_score(str1, str2);
     return PyFloat_FromDouble(score);
 }
 
@@ -169,8 +169,8 @@ static PyMethodDef strcompare_methods[] = {
         "identifying the longest substring common to both strings."
     },
     {
-        "improved_lcs_score", method_improved_lcs_score, METH_VARARGS,
-        "Improved Longest Common Substring Score. Employs a more robust algorithm to "
+        "naive_lcs_score", method_naive_lcs_score, METH_VARARGS,
+        "Naive Longest Common Substring Score. Employs a naive algorithm to "
         "assess the similarity of two strings by identifying the longest substring "
         "common to both strings."
     },

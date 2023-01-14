@@ -3,7 +3,7 @@ compare_func_templates.h
 
 Utility functins and testing templates to assess string comparison functions
 ========================================================================================*/
-#include "../../EWENIT/EWENIT/EWENIT.c"
+#include "../../EWENIT/EWENIT.c"
 #include "random_string.h"
 #include "string_concat.h"
 

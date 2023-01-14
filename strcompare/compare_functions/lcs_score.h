@@ -16,83 +16,9 @@ to the length of the shorter string
 
 #include "../components/utility_functions.h"
 
-// Longest Common Substring score
+
+// Default lcs algorithm
 double lcs_score(const char* str1, const char* str2)
-{
-    int idx1, idx2;
-    int idx1_temp, idx2_temp;
-
-    // Need to know lengths for optimization & final score
-    int len1 = strlen(str1);
-    int len2 = strlen(str2);
-
-    // Edge cases
-    if ((len1 == 0) != (len2 == 0))
-        return 0;
-
-    char chr1, chr2;
-
-    int substr_score;
-    int max_substr_score = 0;
-
-    for (idx1 = 0; idx1 < len1; idx1++)
-    {
-        // Exit when a longer possible substring score cannot be found
-        if ( (len1 - idx1) <= max_substr_score)
-            break;
-
-        idx2 = 0;
-        // consider every idx2 starter for every idx1
-        while (idx2 < len2)
-        {
-            // Exit when a longer possible substring score cannot be found
-            if ( (len2 - idx2) <= max_substr_score)
-                break;
-
-            substr_score = 0;
-            idx1_temp = idx1;
-            idx2_temp = idx2;
-
-            chr1 = *(idx1_temp + str1);
-            chr2 = *(idx2_temp + str2);
-
-            // matching "head" character traverse through str1 & str2 simultaneously
-            // to check how long that substring is
-            while (chr1 == chr2)
-            {
-                // Strings ended - stop consideration (note that we don't need to check
-                // chr1 == '\0' and chr2 == '\0' both, as we can't get here unless
-                // they are equal anyway)
-                if (chr1 == '\0')
-                    break;
-
-                substr_score++;
-                idx1_temp++;
-                idx2_temp++;
-
-                chr1 = *(idx1_temp + str1);
-                chr2 = *(idx2_temp + str2);
-            }
-
-            // Determine if we've found a new better score
-            if (substr_score > max_substr_score)
-                max_substr_score = substr_score;
-
-            idx2++;
-        }
-
-    }
-
-    // Return ratio of longest substr length to the short string (which would be the
-    // maximum length substring possible)
-    if (len1 > len2)
-        return max_substr_score / (double)len2;
-    else
-        return max_substr_score / (double)len1;
-
-}
-
-double improved_lcs_score(const char* str1, const char* str2)
 {
     int idx1, idx2;
     int idx1_temp, idx2_temp;
@@ -167,5 +93,84 @@ double improved_lcs_score(const char* str1, const char* str2)
     else
         return max_substr_score / (double)len1;
 }
+
+
+// Longest Common Substring score
+// naive algorithm
+double naive_lcs_score(const char* str1, const char* str2)
+{
+    int idx1, idx2;
+    int idx1_temp, idx2_temp;
+
+    // Need to know lengths for optimization & final score
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+
+    // Edge cases
+    if ((len1 == 0) != (len2 == 0))
+        return 0;
+
+    char chr1, chr2;
+
+    int substr_score;
+    int max_substr_score = 0;
+
+    for (idx1 = 0; idx1 < len1; idx1++)
+    {
+        // Exit when a longer possible substring score cannot be found
+        if ( (len1 - idx1) <= max_substr_score)
+            break;
+
+        idx2 = 0;
+        // consider every idx2 starter for every idx1
+        while (idx2 < len2)
+        {
+            // Exit when a longer possible substring score cannot be found
+            if ( (len2 - idx2) <= max_substr_score)
+                break;
+
+            substr_score = 0;
+            idx1_temp = idx1;
+            idx2_temp = idx2;
+
+            chr1 = *(idx1_temp + str1);
+            chr2 = *(idx2_temp + str2);
+
+            // matching "head" character traverse through str1 & str2 simultaneously
+            // to check how long that substring is
+            while (chr1 == chr2)
+            {
+                // Strings ended - stop consideration (note that we don't need to check
+                // chr1 == '\0' and chr2 == '\0' both, as we can't get here unless
+                // they are equal anyway)
+                if (chr1 == '\0')
+                    break;
+
+                substr_score++;
+                idx1_temp++;
+                idx2_temp++;
+
+                chr1 = *(idx1_temp + str1);
+                chr2 = *(idx2_temp + str2);
+            }
+
+            // Determine if we've found a new better score
+            if (substr_score > max_substr_score)
+                max_substr_score = substr_score;
+
+            idx2++;
+        }
+
+    }
+
+    // Return ratio of longest substr length to the short string (which would be the
+    // maximum length substring possible)
+    if (len1 > len2)
+        return max_substr_score / (double)len2;
+    else
+        return max_substr_score / (double)len1;
+
+}
+
 
 #endif
