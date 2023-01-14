@@ -13,3 +13,4 @@ todo.txt
 *.o
 *playground*
 *.pyd
+*.obj

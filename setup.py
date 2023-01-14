@@ -6,7 +6,7 @@ from setuptools import setup, Extension
 def main():
     setup(
         name="strcompare",
-        version="1.0.1",
+        version="1.0.2",
         description="Methods to assess string similarity.",
         ext_modules=[
             Extension("strcompare", ["strcompare\\strcompare_module.c"])
