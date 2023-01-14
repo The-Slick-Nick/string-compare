@@ -133,4 +133,29 @@ int summarize_string(const char* str, int* char_counts, int** idx_ref)
     return len;
 }
 
+
+// Identifies the lowest power of two greater than or equal to num
+// i.e. new_pow2(5) = 8, next_pow2(11) = 16
+unsigned int next_pow2(unsigned int num)
+{
+    // edge case 0
+    if (num == 0)
+        return 1;
+
+    // if already a power of 2, return as-is
+    if ( (num & (num - 1)) == 0 )
+        return num;
+
+    // Shift until 1 to throw away rightmost 1's
+    int num_shift = 0;
+    while (num > 1)
+    {
+        num = num>>1;
+        num_shift++;
+    }
+
+    // Shift back leftward
+    num = num<<(num_shift+1);
+    return num;
+}
 #endif

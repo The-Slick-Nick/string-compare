@@ -247,6 +247,25 @@ void test_summarize_string()
 
 }
 
+
+/*=======================================================================================
+next_pow2
+========================================================================================*/
+void test_next_pow2()
+{
+    ASSERT_EQUAL_INT(next_pow2(0), 1);
+    ASSERT_EQUAL_INT(next_pow2(1), 1);
+    ASSERT_EQUAL_INT(next_pow2(2), 2);
+    ASSERT_EQUAL_INT(next_pow2(3), 4);
+    ASSERT_EQUAL_INT(next_pow2(5), 8);
+    ASSERT_EQUAL_INT(next_pow2(13), 16);
+    ASSERT_EQUAL_INT(next_pow2(17), 32);
+    
+}
+
+
+
+
 int main()
 {
     EWENIT_START;
@@ -264,6 +283,8 @@ int main()
     ADD_CASE(test_calc_groups_ADDFIRST_IDX2SECONDMIN, "CG addFirst secondmin idx2_min");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATESECOND, "CG addFirst updates second");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATEFIRST, "CG addFirst updates first");
+
+    ADD_CASE(test_next_pow2, "next_pow2");
 
     EWENIT_END_COMPACT;
 }
