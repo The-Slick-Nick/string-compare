@@ -3,7 +3,8 @@ idx_ref.h
 
 Framework for tracking the indices (by character) for characters in a given model string
 ========================================================================================*/
-
+#ifndef INCLUDE_GUARD_IDXREF
+#define INCLUDE_GUARD_IDXREF
 #include <stdlib.h>
 
 
@@ -37,7 +38,8 @@ void IdxRef_build(IdxRef* self, const char* str)
     for (i = 0; *(str + i) != '\0'; i++)
     {
         total_size++;
-        self->chr_counts[ *(str + i) ]++;
+        (*(self->chr_counts + *(str + i)))++;
+        // self->chr_counts[ *(str + i) ]++;
     }
 
     // One malloc
@@ -50,13 +52,13 @@ void IdxRef_build(IdxRef* self, const char* str)
     for (i = 0; *(str + i) != '\0'; i++)
     {
         chri = *(str + i);
-        // If still 0 (from allocation), we haven't pointed this char to anything yet
+        // If still 0 (from allocation), we haven't pointed this char to a block yet
         if (*(self->ptr_ref + chri) == 0)
         {
             // Assign next available block to current character (at current_offset)
             *(self->ptr_ref + chri) = current_offset;
             // Set current_offset to start of next available block
-            current_offset += self->chr_counts[chri];
+            current_offset += *(self->chr_counts +chri);
         }
 
         // idx_arr[ptr_ref[chri] + min_idx[chri]]
@@ -81,3 +83,12 @@ void IdxRef_deconstruct(IdxRef* self)
     free(self->ptr_ref);
     free(self->idx_arr);
 }
+
+void IdxRef_deconstruct_DEBUG(IdxRef* self, const char* str1, const char* str2)
+{
+    free(self->chr_counts);
+    free(self->ptr_ref);
+    free(self->idx_arr);
+}
+
+#endif
