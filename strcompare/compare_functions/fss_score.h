@@ -50,14 +50,16 @@ adjusted_fss_score
 
 // Scores two strings based on the number of substring matches between the two
 
-// New algorithm with improvement to IdxRefs
+// Assigns a point per character-to-character match within each fractured substring
+// between str1 and str2. Score is calculated as the ratio of total points to the maximum
+// number of possible points (i.e. length of shorter string - 1)
 double fss_score(const char* str1, const char* str2)
 {
 
     // General variables
     int idx1, idx2;                 // indices for accessing str1 and str2
     int len1, len2;                 // lengths of str1 and str2
-    IdxRef iref;
+    IdxRef iref;                    // string index tracking struct for str2
     CalcGroup* cg;                  // CalcGroup struct for tracking results
 
     // Loop tracking variables
@@ -159,111 +161,6 @@ double fss_score(const char* str1, const char* str2)
     return to_return;
 }
 
-// Assigns a point per character-to-character match within each fractured substring
-// between str1 and str2. Score is calculated as the ratio of total points to the maximum
-// number of possible points (i.e. length of shorter string - 1)
-double OLD_fss_score(const char* str1, const char* str2)
-{
-
-    // General variables
-    int* idx_ref[256] = {NULL};     // reference of each str2 index for each str1 char
-    int char_counts[256] = {0};     // counts of each character in str2
-    int idx1, idx2;                 // indices for accessing str1 and str2
-    int len1, len2;                 // lengths of str1 and str2
-    CalcGroup* cg;                  // CalcGroup struct for tracking results
-
-    // Loop tracking variables
-    char chr1;                      // Current character from str1 being considered
-    int num_indices;                // Number of idx2 matching this chr1
-    int i;                          // Current index accessing idx_ref for current chr1
-    bool valid_found;               // Whether idx_ref at this chr1 has something to place
-    bool match_placed;              // Whether idx2 was placed into a calc group for chr1
-    int valid_i;                    // i within idx_ref to use if no matches found
-
-
-    // Swap str1 and str2 if str1 is chosen as the basis 
-    int basis_code = choose_fss_basis(str1, str2);
-    if (basis_code == 0)
-    {
-        const char* temp = str1;
-        str1 = str2;
-        str2 = temp;
-    }
-
-    len1 = strlen(str1);
-    len2 = summarize_string(str2, char_counts, idx_ref);
-
-    // Due to how score is calculated, cannot perform regular algorithm on lengths
-    // less than 2
-
-    // Both empty - 100% equal
-    if (len1 == 0 && len2 == 0)
-        return (double)1;
-    // Exactly 1 empty - 0% equal
-    else if ((len1 == 0) != (len2 == 0))
-        return (double)0;
-    // 1 is either empty or has one character. Check if str2 has its matching char
-    else if (len1 < 2)
-        return (double)(idx_ref[*(str1)] != NULL);
-
-
-    // Begin score calculation
-    cg = CalcGroup_init();
-
-    // Consider each character in str1
-    for (idx1 = 0; idx1 < len1; idx1++)
-    {
-        chr1 = *(str1 + idx1);
-        num_indices = char_counts[chr1];
-
-        // Now decide if we can place on existing or have to create a item in calc group
-        valid_found = false;
-        match_placed = false;
-        for (i = 0; i < num_indices; i++)
-        {
-            idx2 = *(idx_ref[chr1] + i);
-
-            if (!valid_found && idx2 >= 0)
-            {
-                valid_found = true;
-                valid_i = i;
-            }
-
-            // Cannot place, go to next idx2
-            if (idx2 <= cg->idx2_min)
-                continue;
-
-            // By getting here, idx2 should be able to be placed. Check just in case
-            match_placed = CalcGroup_addFirst(cg, idx1, idx2);
-            if (match_placed)
-            {
-                // Mark as considered
-                *(idx_ref[chr1] + i) = -1;
-                break;
-            }
-        }
-
-        // If we didn't place a match, need to add a new item to calc group
-        // Use the first valid (> -1) idx2 encountered, if one exists (otherwise none
-        // to place)
-        if (!match_placed && valid_found)
-        {
-            idx2 = *(idx_ref[chr1] + valid_i);
-            CalcGroup_addNew(cg, idx1, idx2);
-            // Also mark this idx2 as already used
-            *(idx_ref[chr1] + valid_i) = -1;
-        }
-    }
-
-    double to_return = cg->matches / (double)(len1 - 1);
-
-    // Free allocated memory
-    for (i = 0; i < 256; i++) {free(idx_ref[i]);}
-    CalcGroup_deconstruct(cg);
-
-    return to_return;
-}
-
 
 // Assigns x points per character-to-character match within each fractured substring,
 // where x = len(longer string) - 2.
@@ -276,10 +173,9 @@ double OLD_fss_score(const char* str1, const char* str2)
 double adjusted_fss_score(const char* str1, const char* str2)
 {
     // General variables
-    int* idx_ref[256] = {NULL};     // reference of each str2 index for each str1 char
-    int char_counts[256] = {0};     // counts of each character in str2
     int idx1, idx2;                 // indices for accessing str1 and str2
     int len1, len2;                 // lengths of str1 and str2
+    IdxRef iref;                    // string index tracking struct for str2
     CalcGroup* cg;                  // CalcGroup struct for tracking results
 
     // Loop tracking variables
@@ -303,7 +199,7 @@ double adjusted_fss_score(const char* str1, const char* str2)
 
     // Calculate lengths & build reference for str2
     len1 = strlen(str1);
-    len2 = summarize_string(str2, char_counts, idx_ref);
+    len2 = strlen(str2);
 
     // Due to how score is calculated, cannot perform regular algorithm on strings
     // where len1 < 2 or len2 < 3
@@ -316,7 +212,14 @@ double adjusted_fss_score(const char* str1, const char* str2)
         return (double)0;
     // len1 too short - check if chr2 has a match
     else if (len1 == 1)
-        return (double)(idx_ref[*(str1)] != NULL);
+    {
+        for (idx2 = 0; idx2 < len2; idx2++)
+        {
+            if (*str1 == *(str2 + idx2))
+                return (double)1;
+        }
+        return (double)0;
+    }
     // len2 is too short, manually handle edge cases
     else if (len2 < 3)
     {
@@ -330,12 +233,14 @@ double adjusted_fss_score(const char* str1, const char* str2)
 
     // Begin score calculation
     cg = CalcGroup_init();
+    IdxRef_build(&iref, str2);
 
     // Consider each character in str1
     for (idx1 = 0; idx1 < len1; idx1++)
     {
         chr1 = *(str1 + idx1);
-        num_indices = char_counts[chr1];
+        num_indices = IdxRef_getChrCount(&iref, chr1);
+        // num_indices = char_counts[chr1];
 
         // Now decide if we can place on existing or have to create a new calc group
         valid_found = false;
@@ -343,7 +248,7 @@ double adjusted_fss_score(const char* str1, const char* str2)
         // Consider each matched idx2
         for (i = 0; i < num_indices; i++)
         {
-            idx2 = *(idx_ref[chr1] + i);
+            idx2 = IdxRef_getIndex(&iref, chr1, i);
 
             // Flag that at least one idx2 at this character is valid
             if (!valid_found && idx2 >= 0)
@@ -361,7 +266,7 @@ double adjusted_fss_score(const char* str1, const char* str2)
             if (match_placed)
             {
                 // Mark as considered
-                *(idx_ref[chr1] + i) = -1;
+                IdxRef_updateIndex(&iref, chr1, i, -1);
                 break;
             }
         }
@@ -370,10 +275,10 @@ double adjusted_fss_score(const char* str1, const char* str2)
         // If valid_found == false, then there are no more idx2 for this char1 to place
         if (!match_placed && valid_found)
         {
-            idx2 = *(idx_ref[chr1] + valid_i);
+            idx2 = IdxRef_getIndex(&iref, chr1, valid_i);
             CalcGroup_addNew(cg, idx1, idx2);
             // Also mark this idx2 as already used
-            *(idx_ref[chr1] + valid_i) = -1;
+            IdxRef_updateIndex(&iref, chr1, valid_i, -1);
         }
     }
 
@@ -386,8 +291,8 @@ double adjusted_fss_score(const char* str1, const char* str2)
     );
 
     // Free allocated memory
-    for (i = 0; i < 256; i++) {free(idx_ref[i]);}
     CalcGroup_deconstruct(cg);
+    IdxRef_deconstruct(&iref);
 
     return to_return;
 }

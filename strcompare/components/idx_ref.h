@@ -91,11 +91,4 @@ void IdxRef_deconstruct(IdxRef* self)
     free(self->idx_arr);
 }
 
-void IdxRef_deconstruct_DEBUG(IdxRef* self, const char* str1, const char* str2)
-{
-    free(self->chr_counts);
-    free(self->ptr_ref);
-    free(self->idx_arr);
-}
-
 #endif
