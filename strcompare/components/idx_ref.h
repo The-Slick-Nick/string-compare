@@ -1,5 +1,15 @@
+/*=======================================================================================
+idx_ref.h
+
+Framework for tracking the indices (by character) for characters in a given model string
+========================================================================================*/
+
 #include <stdlib.h>
 
+
+/*=======================================================================================
+Structure Definition
+========================================================================================*/
 
 typedef struct {
     int* chr_counts;        // Array of counts per character
@@ -7,6 +17,10 @@ typedef struct {
     int* idx_arr;           // Array of all indices found for a provided string
 } IdxRef;
 
+
+/*=======================================================================================
+Public methods
+========================================================================================*/
 
 void IdxRef_build(IdxRef* self, const char* str)
 {
