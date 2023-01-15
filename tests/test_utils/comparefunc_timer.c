@@ -38,7 +38,8 @@ typedef struct CompareFunctionTimer {
 /*========================================================================================
 Private Methods
 ========================================================================================*/
-// Swaps two elements of
+
+// Swaps two elements of CFuncTimer.functions based on their total time taken
 void _CFuncTimer_swapItems(CFuncTimer* self, int idx1, int idx2)
 {
     _cfuncitem temp;
@@ -47,6 +48,7 @@ void _CFuncTimer_swapItems(CFuncTimer* self, int idx1, int idx2)
     *(self->functions + idx2) = temp;
 }
 
+// Performs quicksort on CFuncTimer.functions on their total time taken, asc order
 void _CFuncTimer_qsort(CFuncTimer* self, int min_idx, int max_idx)
 {
 
@@ -111,7 +113,6 @@ void _CFuncTimer_qsort(CFuncTimer* self, int min_idx, int max_idx)
     _CFuncTimer_qsort(self, right_idx + 1, max_idx);
 
 }
-
 
 /*========================================================================================
 Public Methods
@@ -201,7 +202,7 @@ void CFuncTimer_printResults(CFuncTimer* self)
     }
 }
 
-// Sorts results based on each _cfuncitem time_taken
+// Sorts results based on each function's time taken
 void CFuncTimer_sortResults(CFuncTimer* self)
 {
     _CFuncTimer_qsort(self, 0, self->length - 1);
