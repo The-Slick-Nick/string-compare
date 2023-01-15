@@ -51,7 +51,7 @@ adjusted_fss_score
 // Assigns a point per character-to-character match within each fractured substring
 // between str1 and str2. Score is calculated as the ratio of total points to the maximum
 // number of possible points (i.e. length of shorter string - 1)
-double fss_score(char* str1, char* str2)
+double fss_score(const char* str1, const char* str2)
 {
 
     // General variables
@@ -74,7 +74,7 @@ double fss_score(char* str1, char* str2)
     int basis_code = choose_fss_basis(str1, str2);
     if (basis_code == 0)
     {
-        char* temp = str1;
+        const char* temp = str1;
         str1 = str2;
         str2 = temp;
     }
