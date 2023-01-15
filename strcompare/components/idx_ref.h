@@ -2,6 +2,32 @@
 idx_ref.h
 
 Framework for tracking the indices (by character) for characters in a given model string
+
+Basic struct consists of three parts:
+    1. chr_counts
+        A 0-255 indexed array representing the number of instances per character
+        in a modeled string. (index corresponds to chr code of a character, i.e. 'A' - 65)
+    2. ptr_ref
+        A 0-255 indexed arry reprsenting pointer-offsets where a particular character
+        is referenced in idx_arr (3.). Value corresponding to character represents
+        where to look in idx_arr to find what indices a character appears at in the
+        modeled string. Defaults to 0, indicating an invalid reference.
+    3. idx_arr
+        An array of all indices from modeled string for each character. One contiguous
+        block, identified by referencing ptr_ref. Note that space allocated is one
+        greater than string, as index 0 is "blocked off" as invalid.
+
+Example:
+string 'lava' results in the following (non-represented characters excluded, will be 0)
+L A V A
+0 1 2 3 
+chr_counts              ptr_ref             idx_arr
+    IDX         VAL     IDX         VAL     IDX     VAL
+     97 ('a')   2        97 ('a')    2      0       N/A
+    108 ('l')   1       108 ('l')    1      1       0       (l, FIRST IDX)       
+    118 ('v')   1       118 ('v')    4      2       1       (a, FIRST IDX)
+                                            3       3       (a, SECOND_IDX)    
+                                            4       2       (v, FIRST_IDX)      
 ========================================================================================*/
 #ifndef INCLUDE_GUARD_IDXREF
 #define INCLUDE_GUARD_IDXREF
