@@ -19,7 +19,7 @@ Basic struct consists of three parts:
 
 Example:
 string 'lava' results in the following (non-represented characters excluded, will be 0)
-L A V A
+l a v a
 0 1 2 3 
 chr_counts              ptr_ref             idx_arr
     IDX         VAL     IDX         VAL     IDX     VAL
