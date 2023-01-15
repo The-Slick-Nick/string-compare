@@ -8,6 +8,7 @@ Tests on helper components for comparison methods to ensure they work correctly
 #include "../EWENIT/EWENIT.c"
 #include "../strcompare/components/calc_groups.h"
 #include "../strcompare/components/utility_functions.h"
+#include "../strcompare/components/idx_ref.h"
 
 
 /*=======================================================================================
@@ -247,6 +248,61 @@ void test_summarize_string()
 
 }
 
+/*=======================================================================================
+IdxRef
+========================================================================================*/
+
+void test_idx_ref()
+{
+    IdxRef ref;
+    IdxRef_build(&ref, "greetings");
+
+    // Test chr_counts
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'g'), 2);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'r'), 1);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'e'), 2);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 't'), 1);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'i'), 1);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'n'), 1);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 's'), 1);
+
+    // Test ptr_ref
+    // G R E T I N S
+    // 1 3 4 6 7 8 9
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'g'), 1);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'r'), 3);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'e'), 4);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 't'), 6);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'i'), 7);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'n'), 8);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 's'), 9);
+
+    // Test idx_arr (index 0 invalid)
+    // 0 1 2 3 4 5 6 7 8 9
+    // X 0 7 1 2 3 4 5 6 8
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 1), 0);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 2), 7);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 3), 1);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 4), 2);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 5), 3);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 6), 4);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 7), 5);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 8), 6);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 9), 8);
+
+    // Test front-facing get functions 
+    ASSERT_EQUAL_INT(IdxRef_getChrCount(&ref, 'g'), 2);
+    ASSERT_EQUAL_INT(IdxRef_getIndex(&ref, 'e', 1), 3);
+
+
+    IdxRef_deconstruct(&ref);
+}
+
+
+/*=======================================================================================
+Main method
+========================================================================================*/
+
 int main()
 {
     EWENIT_START;
@@ -264,6 +320,8 @@ int main()
     ADD_CASE(test_calc_groups_ADDFIRST_IDX2SECONDMIN, "CG addFirst secondmin idx2_min");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATESECOND, "CG addFirst updates second");
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATEFIRST, "CG addFirst updates first");
+
+    ADD_CASE(test_idx_ref, "idx ref");
 
     EWENIT_END_COMPACT;
 }
