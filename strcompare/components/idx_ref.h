@@ -67,9 +67,16 @@ void IdxRef_build(IdxRef* self, const char* str)
     }
 }
 
+// Retrieve ith index for a given character from idx_ref 
 int IdxRef_getIndex(IdxRef* self, char chr, int chr_num)
 {
     return *(self->idx_arr + *(self->ptr_ref + chr) + chr_num);
+}
+
+// Set the ith index for a given character in idx_ref to a new value
+void IdxRef_updateIndex(IdxRef* self, char chr, int chr_num, int new_val)
+{
+    *(self->idx_arr + *(self->ptr_ref + chr) + chr_num) = new_val;
 }
 
 int IdxRef_getChrCount(IdxRef* self, char chr)

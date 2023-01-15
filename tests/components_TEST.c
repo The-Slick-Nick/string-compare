@@ -294,6 +294,10 @@ void test_idx_ref()
     ASSERT_EQUAL_INT(IdxRef_getChrCount(&ref, 'g'), 2);
     ASSERT_EQUAL_INT(IdxRef_getIndex(&ref, 'e', 1), 3);
 
+    // Now test updating index
+    IdxRef_updateIndex(&ref, 'e', 1, -1);
+    ASSERT_EQUAL_INT(IdxRef_getIndex(&ref, 'e', 1), -1);
+
 
     IdxRef_deconstruct(&ref);
 }

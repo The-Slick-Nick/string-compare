@@ -93,7 +93,7 @@ double fss_score(const char* str1, const char* str2)
     // 1 is either empty or has one character. Check if str2 has its matching char
     else if (len1 < 2)
     {
-        for (idx2 = 0; *(str2 + idx2) != '\0'; idx2++)
+        for (idx2 = 0; idx2 < len2; idx2++)
         {
             if (*str1 == *(str2 + idx2))
                 return (double)1;
@@ -133,8 +133,7 @@ double fss_score(const char* str1, const char* str2)
             if (match_placed)
             {
                 // Mark as considered
-                // idx_arr[ptr_ref[chr1] + i] = -1
-                *(iref.idx_arr + (*(iref.ptr_ref + chr1)) + i) = -1;
+                IdxRef_updateIndex(&iref, chr1, i, -1);
                 break;
             }
         }
@@ -147,8 +146,7 @@ double fss_score(const char* str1, const char* str2)
             idx2 = IdxRef_getIndex(&iref, chr1, valid_i);
             CalcGroup_addNew(cg, idx1, idx2);
             // Also mark this idx2 as already used
-            // idx_arr[ptr_ref[chr1] + valid_i] = -1
-            *(iref.idx_arr + (*(iref.ptr_ref + chr1)) + valid_i) = -1;
+            IdxRef_updateIndex(&iref, chr1, valid_i, -1);
         }
     }
 
