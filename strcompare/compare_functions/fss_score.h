@@ -59,8 +59,11 @@ double fss_score(const char* str1, const char* str2)
     // General variables
     int idx1, idx2;                 // indices for accessing str1 and str2
     int len1, len2;                 // lengths of str1 and str2
-    IdxRef iref;                    // string index tracking struct for str2
     CalcGroup* cg;                  // CalcGroup struct for tracking results
+
+    IdxRef iref;                    // string index tracking struct for str2
+    int chr_counts[256] = {0};      // character count array for iref
+    int ptr_ref[256] = {0};         // pointer ref array fo iref
 
     // Loop tracking variables
     char chr1;                      // Current character from str1 being considered
@@ -104,7 +107,7 @@ double fss_score(const char* str1, const char* str2)
     }
 
     // Begin score calculation
-    IdxRef_build(&iref, str2);
+    IdxRef_build(&iref, str2, chr_counts, ptr_ref);
     cg = CalcGroup_init();
 
     // Consider each character in str1
@@ -175,8 +178,11 @@ double adjusted_fss_score(const char* str1, const char* str2)
     // General variables
     int idx1, idx2;                 // indices for accessing str1 and str2
     int len1, len2;                 // lengths of str1 and str2
-    IdxRef iref;                    // string index tracking struct for str2
     CalcGroup* cg;                  // CalcGroup struct for tracking results
+
+    IdxRef iref;                    // string index tracking struct for str2
+    int chr_counts[256] = {0};      // character count arry for iref
+    int ptr_ref[256] = {0};         // pointer ref array for iref
 
     // Loop tracking variables
     char chr1;                      // Current character from str1 being considered
@@ -233,7 +239,7 @@ double adjusted_fss_score(const char* str1, const char* str2)
 
     // Begin score calculation
     cg = CalcGroup_init();
-    IdxRef_build(&iref, str2);
+    IdxRef_build(&iref, str2, chr_counts, ptr_ref);
 
     // Consider each character in str1
     for (idx1 = 0; idx1 < len1; idx1++)

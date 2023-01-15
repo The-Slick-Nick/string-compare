@@ -29,8 +29,10 @@ double lcs_score(const char* str1, const char* str2)
     int max_substr_score;
 
     IdxRef iref;
+    int chr_counts[256] = {0};
+    int ptr_ref[256] = {0};
 
-    IdxRef_build(&iref, str2);
+    IdxRef_build(&iref, str2, chr_counts, ptr_ref);
     len1 = strlen(str1);
     len2 = strlen(str2);
 

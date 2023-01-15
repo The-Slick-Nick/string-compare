@@ -255,7 +255,9 @@ IdxRef
 void test_idx_ref()
 {
     IdxRef ref;
-    IdxRef_build(&ref, "greetings");
+    int chr_counts[256] = {0};
+    int ptr_ref[256] = {0};
+    IdxRef_build(&ref, "greetings", chr_counts, ptr_ref);
 
     // Test chr_counts
     ASSERT_EQUAL_INT(*(ref.chr_counts + 'g'), 2);
