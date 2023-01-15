@@ -154,7 +154,6 @@ void test_naive_fss_score()
     ASSERT_EQUAL_DOUBLE(naive_fss_score("WREATHES", "WEATHERS"), (double)6/7);
 }
 
-
 void test_adjusted_naive_fss_score()
 {
     string_comparison_test(adjusted_naive_fss_score);
