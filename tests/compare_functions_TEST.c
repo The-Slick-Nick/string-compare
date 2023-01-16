@@ -133,6 +133,10 @@ void test_fss_score()
     ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)3/6);
     ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)6/7);
     ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
+
+    // Test a dumb string
+    char dumb_string[] = "ALONSOS WELDING SERVICES\xa0\xa0";
+    ASSERT_EQUAL_INT(fss_score(dumb_string, "ALONSO"), 1);
 }
 
 void test_adjusted_fss_score()

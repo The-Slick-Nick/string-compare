@@ -335,6 +335,32 @@ void test_idx_ref()
     IdxRef_deconstruct(&ref);
 }
 
+void test_idx_ref_DUMBSTRING()
+{
+    IdxRef ref;
+    int chr_counts[256] = {0};
+    int ptr_ref[256] = {0};
+    char dumb_string[] = "A\xa0\xa0";
+    IdxRef_build(&ref, dumb_string, chr_counts, ptr_ref);
+
+    ASSERT_EQUAL_INT(*(ref.chr_counts + 'A'), 1);
+    ASSERT_EQUAL_INT(*(ref.chr_counts + '\xa0'), 2);
+
+    // Test ptr_ref
+    // A \xa0
+    // 1  2
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'A'), 0);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + '\xa0'), 1);
+
+    // Test idx_arr (index 0 invalid)
+    // 0 1 2 3
+    // X 0 1 2
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 1), 0);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 2), 1);
+    ASSERT_EQUAL_INT(*(ref.idx_arr + 3), 2);
+
+
+}
 
 /*=======================================================================================
 Main method
@@ -360,6 +386,7 @@ int main()
     ADD_CASE(test_calc_groups_ADDFIRST_UPDATEFIRST, "CG addFirst updates first");
 
     ADD_CASE(test_idx_ref, "idx ref");
+    ADD_CASE(test_idx_ref_DUMBSTRING, "idx ref DUMBSTRING");
 
     EWENIT_END_COMPACT;
 }
