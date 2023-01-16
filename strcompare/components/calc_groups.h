@@ -14,6 +14,23 @@ each item in the CalcGroup, appending to an existing if both indices are higher
 than the _calcitem representing that group.
 ----------------------------------------------------------------------------------------*/
 
+int next_pow2(unsigned int val)
+{
+    if (val == 0)
+        return 1;
+    
+    if (val & (val - 1) == 0)
+        return val;
+
+    int num_shifts = 0;
+    while(val > 1)
+    {
+        val = val>>1;
+        num_shifts++;
+    }
+    return val<<(num_shifts + 1);
+}
+
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -23,38 +40,29 @@ than the _calcitem representing that group.
 typedef struct CalcItem {
     int idx1;
     int idx2;
-    struct CalcItem* next;
 } _calcitem;
 
 // Manager struct for CalcGroup
 typedef struct CalcGroup {
     int idx2_min;           // Lowest idx2 on a _calcitem head
     int length;             // Number of linked _calclist structs (# of groups)
-    int matches;            // Total number of _calcitem structs (# of entries)
+    int matches;            // Total number of index matches found
     int offset_difference;  // Total difference in idx2 - idx1 offsets
-    _calcitem* first;       // Link to first _calclist in chain
+
+    size_t _size;           // Internally-tracked size of array of _calcitem elems
+    _calcitem* groups;      // Array of _calcitem elems representing substrings
+
 } CalcGroup;
 
 /* INITIALIZATION AND DECONSTRUCTION */
 
-_calcitem* _calcitem_init(int idx1, int idx2)
-{
-    _calcitem* item = (_calcitem*)malloc(sizeof(_calcitem));
-    item->idx1 = idx1;
-    item->idx2 = idx2;
-    item->next = NULL;
-    return item;
-}
-
-CalcGroup* CalcGroup_init()
-{
-    CalcGroup* group = (CalcGroup*)malloc(sizeof(CalcGroup));
-    group->length = 0;              
-    group->matches = 0;
-    group->offset_difference = 0;         
-    group->idx2_min = INT_MAX; 
-    group->first = NULL;
-    return group;
+#define CalcGroup_init(size) {\
+    .idx2_min = INT_MAX,\
+    .length = 0,\
+    .matches = 0,\
+    .offset_difference = 0,\
+    ._size = next_pow2(size),\
+    .groups = (_calcitem*)malloc(next_pow2(size) * sizeof(_calcitem))\
 }
 
 /*
@@ -70,101 +78,64 @@ total score =
 Where l2 = len(longer string) -2 and l1 = len(shorter string) - 1
 
 */
-
-void _calcitem_deconstruct(_calcitem* item)
-{
-    _calcitem* prev = NULL;
-    _calcitem* current = item;
-    while (current != NULL)
-    {
-        // Move to next and free this one
-        prev = current;
-        current = current->next;
-        free(prev);
-    }
-}
-
-void CalcGroup_deconstruct(CalcGroup* group)
+void CalcGroup_deconstruct(CalcGroup* self)
 {
     // Begin chain of _calcitem deconstruction
-    _calcitem_deconstruct(group->first);
-    free(group);
+    free(self->groups);
 }
 
 /* PRINT/AUDIT METHODS */
 
-// Chain through _calcitems, printing each idx1, idx2 combo
-void _calcitem_print(_calcitem* item)
+// Trigger _calclist print chain
+void CalcGroup_print(CalcGroup* self)
 {
-    for (_calcitem* current = item; current != NULL; current = current->next)
+    printf("[");
+    for (int i = 0; i < self->length; i++)
     {
-        printf("(%d, %d)", current->idx1, current->idx2);
-        if (current->next != NULL)
+        printf("(%d, %d)");
+        if (i  != self->length - 1)
             printf(", ");
     }
-}
-
-// Trigger _calclist print chain
-void CalcGroup_print(CalcGroup* group)
-{
-    if (group == NULL)
-        return;
-    printf("[");
-    _calcitem_print(group->first);
     printf("]\n");
     // Now display properties
-    printf("Length: %d\n", group->length);
-    printf("Matches %d\n", group->matches);
-    printf("Offset difference %d\n", group->offset_difference);
-    printf("Min Idx2 %d\n", group->idx2_min);
+    printf("Length: %d\n", self->length);
+    printf("Matches %d\n", self->matches);
+    printf("Offset difference %d\n", self->offset_difference);
+    printf("Min Idx2 %d\n", self->idx2_min);
 }
 
 /* PRIVATE METHODS */
 
-// Insert a new _calcitem into a _calcitem chain (at item_head) and return new item
-// as new head
-_calcitem* _calcitem_insert(_calcitem* item, int idx1, int idx2)
-{
-    _calcitem* new_item = _calcitem_init(idx1, idx2);
-    new_item->next = item;
-    return new_item;
-}
-
-// Updates the values for a provided _calcitem
-void _calcitem_update(_calcitem* item, int idx1, int idx2)
-{
-    item->idx1 = idx1;
-    item->idx2 = idx2;
-}
-
-
 /* PUBLIC METHODS */
 
 // Add a new _calcitem to group at idx1, idx2
-void CalcGroup_addNew(CalcGroup* group, int idx1, int idx2)
+void CalcGroup_addNew(CalcGroup* self, int idx1, int idx2)
 {
-    // new _calcitem
-    _calcitem* new_item = _calcitem_init(idx1, idx2);
+    if (self->length >= self->_size)
+    {
+        while (self->length >= self->_size)
+        {
+            self->_size *= 2;
+        }
+        self->groups = (_calcitem*)realloc(self->groups, self->_size);
+    }
 
-    // Add item to list
-    new_item->next = group->first;
-    group->first = new_item;
+    (*(self->groups + self->length)).idx1 = idx1;
+    (*(self->groups + self->length)).idx2 = idx2;
+    self->length++;
 
-    // Handle list properties
-    group->length++;
-    if (idx2 < group->idx2_min)
-        group->idx2_min = idx2;
-
+    if (idx2 < self->idx2_min)
+        self->idx2_min = idx2;
 }
 
 // Attempts to add a new _calcitem with (idx1, idx2) at the best possible location by 
 // minimizing offset difference by current indices idx1 and idx2 vs a _calcitem's
 // idx1 and idx2.
 // Returns a boolean flag indicating if placement was successful.
-bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
+bool CalcGroup_addBest(CalcGroup* self, int idx1, int idx2)
 {
     // If new item cannot be placed, return false
-    if (idx2 < group->idx2_min || group->length == 0)
+    if (idx2 < self->idx2_min || self->length == 0)
         return false;
 
    int loop_idx1;                   // idx1 on current item in loop
@@ -174,115 +145,113 @@ bool CalcGroup_addBest(CalcGroup* group, int idx1, int idx2)
 
    int min_osdiff_found = INT_MAX;  // Lowest difference in offsets for idx1,idx2
    int secondmin_idx2 = INT_MAX;    // Second minimum idx2 in group
-   _calcitem* best_item = NULL;     // Best candidate for placement (lowest odiff)
+   int best_i = INT_MIN;
+   _calcitem* best_item = NULL;     // Pointer to best candidate for placement
+   _calcitem current;               // Current _calcitem under consideration
 
-   for (_calcitem* current = group->first; current != NULL; current = current->next)
+   for (int i = 0; i < self->length; i++)
    {
-        loop_idx1 = current->idx1;
-        loop_idx2 = current->idx2;
+        current = *(self->groups + i);
+        loop_idx1 = current.idx1;
+        loop_idx2 = current.idx2;
 
-        // Maintain tracking second smallest current idx2 (this only works because
-        // no idx2 can be repeated in group, as they represent character indices)
-        if (loop_idx2 > group->idx2_min && loop_idx2 < secondmin_idx2)
+        if (loop_idx2 > self->idx2_min && loop_idx2 < secondmin_idx2)
             secondmin_idx2 = loop_idx2;
 
-        // Skip this loop if we cannot place (loop_idx2 too big)
         if (loop_idx2 > idx2)
             continue;
 
         loop_osdiff = abs((idx2 - loop_idx2) - (idx1 - loop_idx1));
 
-        // Check if we found a better match
         if (loop_osdiff < min_osdiff_found)
         {
             min_osdiff_found = loop_osdiff;
-            best_item = current;
+            best_i = i;
         }
    }
 
     // Didn't find any valid items - no placements
-   if (best_item == NULL)
+   if (best_i == INT_MIN)
         return false;
 
     // Need to update min_idx2 if its _calcitem replaced it
-    if (best_item->idx2 == group->idx2_min)
+    if (self->groups[best_i].idx2 == self->idx2_min)
     {
         // Use replacement if it is smaller than second minimum idx2
         if (idx2 < secondmin_idx2)
-            group->idx2_min = idx2;
+            self->idx2_min = idx2;
         // Otherwise update to second minimum
         else 
-            group->idx2_min = secondmin_idx2;
+            self->idx2_min = secondmin_idx2;
     }
 
     // Update with our found item
-    group->matches++;
-    group->offset_difference += min_osdiff_found;  // best_item should have lowest offset
+    self->matches++;
+    self->offset_difference += min_osdiff_found;  // best_item should have lowest offset
 
     // Finally, update the element in question
-    _calcitem_update(best_item, idx1, idx2);
+    self->groups[best_i].idx1 = idx1;
+    self->groups[best_i].idx2 = idx2;
     return true;
 }
 
 // Attempt to add a new _calcitem with (idx1, idx2) at the first possible placement
 // location.
 // Returns a boolean flag indicating if placement was successful.
-bool CalcGroup_addFirst(CalcGroup* group, int idx1, int idx2)
+bool CalcGroup_addFirst(CalcGroup* self, int idx1, int idx2)
 {
     // If new item cannot be placed, return false
-    if (idx2 < group->idx2_min || group->length == 0)
+    if (idx2 < self->idx2_min || self->length == 0)
         return false;
 
    int loop_idx1;                   // idx1 on current item in loop
    int loop_idx2;                   // idx2 on current item in loop
 
    int secondmin_idx2 = INT_MAX;    // Second minimum idx2 in group
-   _calcitem* best_item = NULL;     // Best candidate for placement (first valid found)
+   _calcitem current;               // Current calcitem under consideration
+   int best_i = INT_MIN;
    int osdiff_toadd = 0;            // Offset associated with best_item;
 
-   for (_calcitem* current = group->first; current != NULL; current = current->next)
+   for (int i = 0; i < self->length; i++)
    {
-        loop_idx1 = current->idx1;
-        loop_idx2 = current->idx2;
+        current = *(self->groups + i);
+        loop_idx1 = current.idx1;
+        loop_idx2 = current.idx2;
 
-        // Maintain tracking second smallest current idx2 (this only works because
-        // no idx2 can be repeated in group, as they represent character indices)
-        if (loop_idx2 > group->idx2_min && loop_idx2 < secondmin_idx2)
+        if (loop_idx2 > self->idx2_min && loop_idx2 < secondmin_idx2)
             secondmin_idx2 = loop_idx2;
 
-        // Skip this loop if we cannot place (loop_idx2 too big)
         if (loop_idx2 > idx2)
             continue;
 
-        // Set best_item the first time we find a valid element & save its offset
-        if (best_item == NULL)
+        if (best_i == INT_MIN)
         {
             osdiff_toadd = abs((idx2 - loop_idx2) - (idx1 - loop_idx1));
-            best_item = current;
+            best_i = i;
         }
-
    }
 
     // Didn't find any valid items - no placements
-   if (best_item == NULL)
+   if (best_i == INT_MIN)
         return false;
 
     // Need to update min_idx2 if its _calcitem replaced it
-    if (best_item->idx2 == group->idx2_min)
+    if (self->groups[best_i].idx2 == self->idx2_min)
     {
         // Use replacement if it is smaller than second minimum idx2
         if (idx2 < secondmin_idx2)
-            group->idx2_min = idx2;
+            self->idx2_min = idx2;
         // Otherwise update to second minimum
         else 
-            group->idx2_min = secondmin_idx2;
+            self->idx2_min = secondmin_idx2;
     }
 
     // Update with our found item
-    group->matches++;
-    group->offset_difference += osdiff_toadd;  // best_item should have lowest offset
+    self->matches++;
+    self->offset_difference += osdiff_toadd;  // best_item should have lowest offset
 
     // Finally, update the element in question
-    _calcitem_update(best_item, idx1, idx2);
+    self->groups[best_i].idx1 = idx1;
+    self->groups[best_i].idx2 = idx2;
     return true;
 }
