@@ -252,34 +252,6 @@ void test_choose_fss_basis()
 }
 
 /*=======================================================================================
-summarize_string
-========================================================================================*/
-void test_summarize_string()
-{
-    int char_counts[256] = {0};
-    int* idx_ref[256] = {NULL};
-    int len;
-
-    len = summarize_string("HELLO", char_counts, idx_ref);
-
-    // Check length
-    ASSERT_EQUAL_INT(len, 5);
-    // check char_counts
-    ASSERT_EQUAL_INT(char_counts['H'], 1);
-    ASSERT_EQUAL_INT(char_counts['E'], 1);
-    ASSERT_EQUAL_INT(char_counts['L'], 2);
-    ASSERT_EQUAL_INT(char_counts['O'], 1);
-    // check idx_ref
-    ASSERT_EQUAL_INT(*(idx_ref['H'] + 0), 0);
-    ASSERT_EQUAL_INT(*(idx_ref['E'] + 0), 1);
-    ASSERT_EQUAL_INT(*(idx_ref['L'] + 0), 2);
-    ASSERT_EQUAL_INT(*(idx_ref['L'] + 1), 3);
-    ASSERT_EQUAL_INT(*(idx_ref['O'] + 0), 4);
-
-
-}
-
-/*=======================================================================================
 IdxRef
 ========================================================================================*/
 
@@ -343,23 +315,34 @@ void test_idx_ref_DUMBSTRING()
     char dumb_string[] = "A\xa0\xa0";
     IdxRef_build(&ref, dumb_string, chr_counts, ptr_ref);
 
-    ASSERT_EQUAL_INT(*(ref.chr_counts + 'A'), 1);
-    ASSERT_EQUAL_INT(*(ref.chr_counts + '\xa0'), 2);
+    ASSERT_EQUAL_INT(IdxRef_getChrCount(&ref, 'A'), 1);
+    ASSERT_EQUAL_INT(IdxRef_getChrCount(&ref, '\xa0'), 2);
 
-    // Test ptr_ref
-    // A \xa0
-    // 1  2
-    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'A'), 0);
-    ASSERT_EQUAL_INT(*(ref.ptr_ref + '\xa0'), 1);
+    // // Test ptr_ref
+    // // A \xa0
+    // // 1  2
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 'A'), 1);
+    ASSERT_EQUAL_INT(*(ref.ptr_ref + 160), 2);
 
-    // Test idx_arr (index 0 invalid)
-    // 0 1 2 3
-    // X 0 1 2
+    // // Test idx_arr (index 0 invalid)
+    // // 0 1 2 3
+    // // X 0 1 2
     ASSERT_EQUAL_INT(*(ref.idx_arr + 1), 0);
     ASSERT_EQUAL_INT(*(ref.idx_arr + 2), 1);
     ASSERT_EQUAL_INT(*(ref.idx_arr + 3), 2);
 
 
+}
+
+/*=======================================================================================
+Sanitize Char
+========================================================================================*/
+
+void test_sanitize_char()
+{   
+    ASSERT_EQUAL_INT((int)sanitize_char(' '), 32);
+    ASSERT_EQUAL_INT((int)sanitize_char('A'), 65);
+    ASSERT_EQUAL_INT((int)sanitize_char('\xa0'), 160);
 }
 
 /*=======================================================================================
@@ -370,7 +353,6 @@ int main()
 {
     EWENIT_START;
     ADD_CASE(test_choose_fss_basis, "fss_basis");
-    ADD_CASE(test_summarize_string, "summarize_string");
 
     ADD_CASE(test_calc_groups_ADDBEST_IDX2REPLACE, "CG addBest IDX2_REPLACE");
     ADD_CASE(test_calc_groups_ADDBEST_IDX2SECONDMIN, "CG addBest IDX2_NEWELEM");
@@ -388,5 +370,7 @@ int main()
     ADD_CASE(test_idx_ref, "idx ref");
     ADD_CASE(test_idx_ref_DUMBSTRING, "idx ref DUMBSTRING");
 
-    EWENIT_END_COMPACT;
+    ADD_CASE(test_sanitize_char, "sanitize char");
+
+    EWENIT_END;
 }

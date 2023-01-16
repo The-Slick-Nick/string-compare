@@ -95,42 +95,5 @@ int choose_fss_basis(const char* str1, const char* str2)
 //  -------
 //  int
 //      Length of input string `str` as an integer
-int summarize_string(const char* str, int* char_counts, int** idx_ref)
-{
-    int idx;                    // Index for looping through str
-    char chr;                   // Current character in str in a loop
-    int chr_count;              // Current count for a character in loop
-    int min_indices[256] = {0}; // Indices for idx_ref to write to for each char
-    int min_idx;                // In a loop, index to write into idx_ref for current char
-    int len = 0;                // Tabulated length of string
-
-    // First build char_counts
-    for (idx = 0; *(str + idx) != '\0'; idx++)
-    {
-        chr = *(str + idx);
-        len++;
-
-        char_counts[chr]++;
-        // *(char_counts + chr)++;
-    }
-
-    for (idx = 0; *(str + idx) != '\0'; idx++)
-    {
-        chr = *(str + idx);
-        chr_count = char_counts[chr];
-        min_idx = min_indices[chr];
-
-        // Allocate memory for this part of idx_ref if we haven't yet
-        if ( idx_ref[chr] == NULL)
-            idx_ref[chr] = (int*)malloc(chr_count * sizeof(int));
-
-        // Add this index to idx_ref
-
-        // idx_ref[chr][min_idx] = idx;
-        *(idx_ref[chr] + min_idx) = idx;
-        min_indices[chr]++;
-    }
-    return len;
-}
 
 #endif

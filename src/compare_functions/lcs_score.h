@@ -23,7 +23,7 @@ double lcs_score(const char* str1, const char* str2)
     int idx1, idx2;
     int idx1_temp, idx2_temp;
     int len1, len2;
-    char chr1, chr2;
+    unsigned char chr1, chr2;
 
     int substr_score;
     int max_substr_score;
@@ -59,8 +59,8 @@ double lcs_score(const char* str1, const char* str2)
             idx1_temp = idx1;
             idx2_temp = idx2;
 
-            chr1 = *(str1 + idx1_temp);
-            chr2 = *(str2 + idx2_temp);
+            chr1 = (unsigned char)(*(str1 + idx1_temp));
+            chr2 = (unsigned char)(*(str2 + idx2_temp));
             substr_score = 0;
 
             while (chr1 == chr2)
@@ -104,7 +104,7 @@ double naive_lcs_score(const char* str1, const char* str2)
     if ((len1 == 0) != (len2 == 0))
         return 0;
 
-    char chr1, chr2;
+    unsigned char chr1, chr2;
 
     int substr_score;
     int max_substr_score = 0;
@@ -127,8 +127,8 @@ double naive_lcs_score(const char* str1, const char* str2)
             idx1_temp = idx1;
             idx2_temp = idx2;
 
-            chr1 = *(idx1_temp + str1);
-            chr2 = *(idx2_temp + str2);
+            chr1 = (unsigned char)(*(idx1_temp + str1));
+            chr2 = (unsigned char)(*(idx2_temp + str2));
 
             // matching "head" character traverse through str1 & str2 simultaneously
             // to check how long that substring is
@@ -144,8 +144,8 @@ double naive_lcs_score(const char* str1, const char* str2)
                 idx1_temp++;
                 idx2_temp++;
 
-                chr1 = *(idx1_temp + str1);
-                chr2 = *(idx2_temp + str2);
+                chr1 = (unsigned char)(*(idx1_temp + str1));
+                chr2 = (unsigned char)(*(idx2_temp + str2));
             }
 
             // Determine if we've found a new better score

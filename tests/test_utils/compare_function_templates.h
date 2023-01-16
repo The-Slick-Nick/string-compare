@@ -261,6 +261,21 @@ void subset_test(double(*compare_func)(const char*, const char*))
     free(to_compare);
 }
 
+void extended_charset_test(double(*compare_func)(const char*, const char*))
+{
+    char* str1;
+    char* str2;
+    for (int i = 0; i < 1000; i++)
+    {
+        str1 = random_string_charset(CHARSET_EXTENDED);
+        str2 = random_string_charset(CHARSET_EXTENDED);
+        compare_func(str1, str2);
+        free(str1);
+        free(str2);
+    }
+    TEST_PASS("Extended charsets supported over 1000 tests");
+}
+
 /* =======================================================================================
 MASTER TEMPLATE
 ========================================================================================*/
@@ -274,5 +289,6 @@ void string_comparison_test(double(*compare_func)(const char*, const char*))
     reversibility_test(compare_func);
     benchmark_test(compare_func);
     score_range_test(compare_func);
+    extended_charset_test(compare_func);
 
 }

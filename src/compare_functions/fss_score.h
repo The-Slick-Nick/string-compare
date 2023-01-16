@@ -66,7 +66,7 @@ double fss_score(const char* str1, const char* str2)
     int ptr_ref[256] = {0};         // pointer ref array fo iref
 
     // Loop tracking variables
-    char chr1;                      // Current character from str1 being considered
+    unsigned char chr1;             // Current character from str1 being considered
     int num_indices;                // Number of idx2 matching this chr1
     int i;                          // Current index accessing idx_ref for current chr1
     bool valid_found;               // Whether idx_ref at this chr1 has something to place
@@ -113,7 +113,7 @@ double fss_score(const char* str1, const char* str2)
     // Consider each character in str1
     for (idx1 = 0; idx1 < len1; idx1++)
     {
-        chr1 = *(str1 + idx1);
+        chr1 = (unsigned char)(*(str1 + idx1));
         num_indices = IdxRef_getChrCount(&iref, chr1);
 
         // Now decide if we can place on existing or have to create a item in calc group
@@ -244,7 +244,7 @@ double adjusted_fss_score(const char* str1, const char* str2)
     // Consider each character in str1
     for (idx1 = 0; idx1 < len1; idx1++)
     {
-        chr1 = *(str1 + idx1);
+        chr1 = (unsigned char)(*(str1 + idx1));
         num_indices = IdxRef_getChrCount(&iref, chr1);
         // num_indices = char_counts[chr1];
 
@@ -309,7 +309,6 @@ double naive_fss_score(const char* str1, const char* str2)
 {
     int idx1, idx2;
     int sub_idx1, sub_idx2;
-    char chr1, chr2;
     int len1, len2;
 
     int total_score = 0;
@@ -419,7 +418,6 @@ double adjusted_naive_fss_score(const char* str1, const char* str2)
 {
     int idx1, idx2;
     int sub_idx1, sub_idx2;
-    char chr1, chr2;
     int len1, len2;
 
     int osdiff;

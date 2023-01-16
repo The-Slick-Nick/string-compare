@@ -14,19 +14,22 @@ double cdist_score(const char* str1, const char* str2)
     int total_len = 0;
     int total_diff = 0;
     int i;
+    unsigned char chri;
     // int i1, i2, idist;
 
     int cdist[256] = {0};
 
     for (i = 0; *(str1 + i) != '\0'; i++)
     {
-        cdist[*(str1 + i)]++;
+        chri = (unsigned char)(*(str1 + i));
+        cdist[chri]++;
         total_len++;
     }
 
     for (i = 0; *(str2 + i) != '\0'; i++)
     {
-        cdist[*(str2 + i)]--;
+        chri = (unsigned char)(*(str2 + i));
+        cdist[chri]--;
         total_len++;
     }
 

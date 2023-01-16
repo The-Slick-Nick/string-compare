@@ -10,6 +10,7 @@
 #define CHARSET_NUMBERS         0
 #define CHARSET_UPPERCASE       1
 #define CHARSET_LOWERCASE       2
+#define CHARSET_EXTENDED        3
 
 
 // Returns a string of random characters of random length
@@ -65,6 +66,9 @@ char* random_string_charset(int char_set)
                 break;
             case CHARSET_LOWERCASE: // lowercase letters
                 this_char = 97 + rand() % (127 - 97);
+                break;
+            case CHARSET_EXTENDED: // 128-255
+                this_char = 128 + rand() & (255 - 128);
                 break;
         }
         *(return_str + i) = (char)this_char;
