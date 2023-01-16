@@ -229,7 +229,7 @@ void CalcGroup_print(CalcGroup* self)
     printf("[");
     for (int i = 0; i < self->length; i++)
     {
-        printf("(%d, %d)");
+        printf("(%d, %d)", (*(self->groups + i)).idx1, (*(self->groups + i)).idx2);
         if (i  != self->length - 1)
             printf(", ");
     }

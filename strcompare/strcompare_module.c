@@ -1,7 +1,7 @@
 /*========================================================================================
 strcompare_module.c
 Pythod module definition for strcompare.
-Version 1.0.1
+Version 1.2.0
 
 Included functions
 ------------------

@@ -234,7 +234,7 @@ API Macro Definition
 // Run tests, sort results, print resuls, and clean up
 // To be used after CFUNC_TIMER_START and any CFUNC_TIMER_ADD calls
 #define CFUNC_TIMER_END \
-    CFuncTimer_runTests(&functimer, 10000);\
+    CFuncTimer_runTests(&functimer, 1000000);\
     CFuncTimer_sortResults(&functimer);\
     CFuncTimer_printResults(&functimer);\
     CFuncTimer_freeMembers(&functimer)
