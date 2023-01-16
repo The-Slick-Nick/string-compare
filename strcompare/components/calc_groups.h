@@ -13,7 +13,16 @@ New potential character matches between one string and another are assessed agai
 each item in the CalcGroup, appending to an existing if both indices are higher
 than the _calcitem representing that group.
 ----------------------------------------------------------------------------------------*/
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
 
+/*========================================================================================
+Helper functions
+========================================================================================*/
+
+// Finds the next power of 2 greater or equal to provided value
+// Note: I would make this static, but its use in the macros prevents that
 int next_pow2(unsigned int val)
 {
     if (val == 0)
@@ -32,9 +41,9 @@ int next_pow2(unsigned int val)
 }
 
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
+/*========================================================================================
+Struct definition
+========================================================================================*/
 
 // "private" struct holding indices and references to next linked _calcitem
 typedef struct CalcItem {
@@ -54,71 +63,29 @@ typedef struct CalcGroup {
 
 } CalcGroup;
 
-/* INITIALIZATION AND DECONSTRUCTION */
 
-#define CalcGroup_init(size) {\
-    .idx2_min = INT_MAX,\
-    .length = 0,\
-    .matches = 0,\
-    .offset_difference = 0,\
-    ._size = next_pow2(size),\
-    .groups = (_calcitem*)malloc(next_pow2(size) * sizeof(_calcitem))\
-}
+/*========================================================================================
+Private Methods
+========================================================================================*/
 
-/*
-NOTE TO SELF:
-CalcGroup keeps track of grand total offset difference. The final score
-should be tabulated as:
-
-total score = 
-    (num matches * l2) - total_offset_sum
-    ______________________________________
-    l2 * l1
-
-Where l2 = len(longer string) -2 and l1 = len(shorter string) - 1
-
-*/
-void CalcGroup_deconstruct(CalcGroup* self)
+void _CalcGroup_resize(CalcGroup* self)
 {
-    // Begin chain of _calcitem deconstruction
-    free(self->groups);
-}
-
-/* PRINT/AUDIT METHODS */
-
-// Trigger _calclist print chain
-void CalcGroup_print(CalcGroup* self)
-{
-    printf("[");
-    for (int i = 0; i < self->length; i++)
+    while (self->length >= self->_size)
     {
-        printf("(%d, %d)");
-        if (i  != self->length - 1)
-            printf(", ");
+        self->_size *= 2;
     }
-    printf("]\n");
-    // Now display properties
-    printf("Length: %d\n", self->length);
-    printf("Matches %d\n", self->matches);
-    printf("Offset difference %d\n", self->offset_difference);
-    printf("Min Idx2 %d\n", self->idx2_min);
+    self->groups = (_calcitem*)realloc(self->groups, self->_size * sizeof(_calcitem));
 }
 
-/* PRIVATE METHODS */
-
-/* PUBLIC METHODS */
+/*========================================================================================
+Public Methods
+========================================================================================*/
 
 // Add a new _calcitem to group at idx1, idx2
 void CalcGroup_addNew(CalcGroup* self, int idx1, int idx2)
 {
     if (self->length >= self->_size)
-    {
-        while (self->length >= self->_size)
-        {
-            self->_size *= 2;
-        }
-        self->groups = (_calcitem*)realloc(self->groups, self->_size);
-    }
+        _CalcGroup_resize(self);
 
     (*(self->groups + self->length)).idx1 = idx1;
     (*(self->groups + self->length)).idx2 = idx2;
@@ -255,3 +222,44 @@ bool CalcGroup_addFirst(CalcGroup* self, int idx1, int idx2)
     self->groups[best_i].idx2 = idx2;
     return true;
 }
+
+// Print out how CalcGroup currently looks
+void CalcGroup_print(CalcGroup* self)
+{
+    printf("[");
+    for (int i = 0; i < self->length; i++)
+    {
+        printf("(%d, %d)");
+        if (i  != self->length - 1)
+            printf(", ");
+    }
+    printf("]\n");
+    // Now display properties
+    printf("Length: %d\n", self->length);
+    printf("Matches %d\n", self->matches);
+    printf("Offset difference %d\n", self->offset_difference);
+    printf("Min Idx2 %d\n", self->idx2_min);
+}
+
+
+void CalcGroup_deconstruct(CalcGroup* self)
+{
+    free(self->groups);
+}
+
+
+/*========================================================================================
+API Macros
+========================================================================================*/
+
+// Use this to initialize when using one
+#define CalcGroup_init(size) (CalcGroup) {\
+    .idx2_min = INT_MAX,\
+    .length = 0,\
+    .matches = 0,\
+    .offset_difference = 0,\
+    ._size = (size > 4 ? next_pow2(size): 4),\
+    .groups = (_calcitem*)malloc((size > 4 ? next_pow2(size) : 4) * sizeof(_calcitem))\
+}
+
+

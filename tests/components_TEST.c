@@ -203,6 +203,22 @@ void test_calc_groups_ADDFIRST_IDX2SECONDMIN()
     CalcGroup_deconstruct(&cg);
 }
 
+void test_calc_groups_RESIZE()
+{
+    CalcGroup cg = CalcGroup_init(1);
+
+    // 5 elements added
+    CalcGroup_addNew(&cg, 1, 1);
+    CalcGroup_addNew(&cg, 2, 2);
+    CalcGroup_addNew(&cg, 3, 3);
+    CalcGroup_addNew(&cg, 4, 4);
+    CalcGroup_addNew(&cg, 5, 5);
+
+    ASSERT_EQUAL_INT(cg._size, 8);
+
+    CalcGroup_deconstruct(&cg);
+}
+
 
 /*=======================================================================================
 choose_fss_basis
@@ -338,6 +354,7 @@ int main()
     ADD_CASE(test_calc_groups_ADDBEST_UPDATEFIRST, "CG addBest Update First");
     ADD_CASE(test_calc_groups_ADDBEST_UPDATESECOND, "CG addBest Update Second");
     ADD_CASE(test_calc_groups_ADDNEW, "CG Add New");
+    ADD_CASE(test_calc_groups_RESIZE, "CG resize");
 
     ADD_CASE(test_calc_groups_ADDFIRST_IDX2REPLACE, "CG addFirst Replace idx2_min");
     ADD_CASE(test_calc_groups_ADDFIRST_IDX2SECONDMIN, "CG addFirst secondmin idx2_min");
