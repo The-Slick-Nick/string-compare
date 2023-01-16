@@ -15,9 +15,9 @@ to the length of the shorter string
 #include <string.h>
 
 #include "../components/utility_functions.h"
+#include "../components/idx_ref.h"
 
-
-// Default lcs algorithm
+// Longest Common Substring score
 double lcs_score(const char* str1, const char* str2)
 {
     int idx1, idx2;
@@ -28,12 +28,13 @@ double lcs_score(const char* str1, const char* str2)
     int substr_score;
     int max_substr_score;
 
-    int char_counts[256] = {0};     // Counts of characters in str2 by their ascii val
-    int* idx_ref[256] = {NULL};     // Arrays of each index found in str2 by char
+    IdxRef iref;
+    int chr_counts[256] = {0};
+    int ptr_ref[256] = {0};
 
-    // Build our arrays for use in algorithm
-    len2 = summarize_string(str2, char_counts, idx_ref);
+    IdxRef_build(&iref, str2, chr_counts, ptr_ref);
     len1 = strlen(str1);
+    len2 = strlen(str2);
 
     // Exactly one blank - exit early, 0 score
     if ( (len1 == 0) != (len2 == 0))
@@ -48,15 +49,13 @@ double lcs_score(const char* str1, const char* str2)
             break;
 
         // Consider each associated idx2 for this character
-        for (int i = 0; i < char_counts[ *(str1 + idx1) ]; i++)
-        {   // idx_ref[str1_chr][i]
-            idx2 = *(idx_ref[ *(str1 + idx1) ] + i);
+        for (int i = 0; i < IdxRef_getChrCount(&iref, *(str1 + idx1)); i++)
+        {
+            idx2 = IdxRef_getIndex(&iref, *(str1 + idx1), i);
 
-            // Stop considering this char if can't find better score
-            // (idx2 is in ascending order here)
             if (len2 - idx2 <= max_substr_score)
                 break;
-
+            
             idx1_temp = idx1;
             idx2_temp = idx2;
 
@@ -64,7 +63,6 @@ double lcs_score(const char* str1, const char* str2)
             chr2 = *(str2 + idx2_temp);
             substr_score = 0;
 
-            // Increment both as long as they match - checking substr length
             while (chr1 == chr2)
             {
                 if (chr1 == '\0')
@@ -77,15 +75,12 @@ double lcs_score(const char* str1, const char* str2)
                 chr2 = *(str2 + idx2_temp);
             }
 
-            // Check vs current running max
             if (substr_score > max_substr_score)
                 max_substr_score = substr_score;
         }
     }
 
-    // Now free our allocated memory
-    for (int i = 0; i < 256; i++)
-        free(idx_ref[i]);
+    IdxRef_deconstruct(&iref);
 
     // Return
     if (len1 > len2)
@@ -93,7 +88,6 @@ double lcs_score(const char* str1, const char* str2)
     else
         return max_substr_score / (double)len1;
 }
-
 
 // Longest Common Substring score
 // naive algorithm
