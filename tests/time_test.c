@@ -2,14 +2,15 @@
 
 #include "test_utils/comparefunc_timer.c"
 
-#include "../strcompare/compare_functions/cdist_score.h"
-#include "../strcompare/compare_functions/fss_score.h"
-#include "../strcompare/compare_functions/lcs_score.h"
-#include "../strcompare/compare_functions/levenshtein_score.h"
+#include "../src/compare_functions/cdist_score.h"
+#include "../src/compare_functions/fss_score.h"
+#include "../src/compare_functions/lcs_score.h"
+#include "../src/compare_functions/levenshtein_score.h"
 
 int main()
 {
     CFUNC_TIMER_START;
+
     CFUNC_TIMER_ADD(cdist_score, "cdist");
 
     CFUNC_TIMER_ADD(fss_score, "fss score");

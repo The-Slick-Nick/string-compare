@@ -3,7 +3,7 @@ compare_func_templates.h
 
 Utility functins and testing templates to assess string comparison functions
 ========================================================================================*/
-#include "../../EWENIT/EWENIT.c"
+#include "../../libs/EWENIT/EWENIT.c"
 #include "random_string.h"
 #include "string_concat.h"
 
@@ -14,7 +14,9 @@ Utility functins and testing templates to assess string comparison functions
 /*========================================================================================
 HELPER FUNCS
 ========================================================================================*/
-double time_comparison_func(double(*compare_func)(), int num_tests)
+double time_comparison_func(
+    double(*compare_func)(const char*, const char*), int num_tests
+)
 {
     clock_t start;
     clock_t end;
@@ -46,7 +48,7 @@ SUBTEST TEMPLATES
 ========================================================================================*/
 
 // test that func(str1, str2) == 1.0 for str1 == str2
-void exact_equality_test(double(*compare_func)())
+void exact_equality_test(double(*compare_func)(const char*, const char*))
 {
     char* test_str;
     double score;
@@ -65,7 +67,7 @@ void exact_equality_test(double(*compare_func)())
 }
 
 // test that func(str1, str2) == func(str2, str1)
-void reversibility_test(double(*compare_func)())
+void reversibility_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
@@ -91,7 +93,7 @@ void reversibility_test(double(*compare_func)())
 }
 
 // Test that func(str1, str2) == 0.0 if str1 and str2 share 0 characters
-void inequality_test(double(*compare_func)())
+void inequality_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
@@ -113,7 +115,7 @@ void inequality_test(double(*compare_func)())
 }
 
 // test that func(str1, "") == 0 for any str1 != ""
-void one_empty_test(double(*compare_func)())
+void one_empty_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     double score;
@@ -133,7 +135,7 @@ void one_empty_test(double(*compare_func)())
 }
 
 // test that 0.0 <= func(str1, str2) <= 1.0 for any valid str1, str2
-void score_range_test(double(*compare_func)())
+void score_range_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
@@ -160,7 +162,7 @@ void score_range_test(double(*compare_func)())
 }
 
 // test that 10000 runs of func executes within 1 second
-void benchmark_test(double(*compare_func)())
+void benchmark_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
@@ -201,7 +203,7 @@ void benchmark_test(double(*compare_func)())
 }
 
 // test that funct(str1, str2) == 1.0 if str1 is a subset of str2 or vice versa
-void subset_test(double(*compare_func)())
+void subset_test(double(*compare_func)(const char*, const char*))
 {
 
     char* prefix;
@@ -264,7 +266,7 @@ MASTER TEMPLATE
 ========================================================================================*/
 
 // Series of standard check that should be true for ANY string comparison function
-void string_comparison_test(double(*compare_func)())
+void string_comparison_test(double(*compare_func)(const char*, const char*))
 {
     exact_equality_test(compare_func);
     inequality_test(compare_func);

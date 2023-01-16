@@ -12,14 +12,14 @@ Tests on string comparison methods
     levenshtein_score
 ========================================================================================*/
 
-#include "../EWENIT/EWENIT.c"
+#include "../libs/EWENIT/EWENIT.c"
 #include "test_utils/random_string.h"
 #include "test_utils/compare_function_templates.h"
 
-#include "../strcompare/compare_functions/cdist_score.h"
-#include "../strcompare/compare_functions/lcs_score.h"
-#include "../strcompare/compare_functions/fss_score.h"
-#include "../strcompare/compare_functions/levenshtein_score.h"
+#include "../src/compare_functions/cdist_score.h"
+#include "../src/compare_functions/lcs_score.h"
+#include "../src/compare_functions/fss_score.h"
+#include "../src/compare_functions/levenshtein_score.h"
 
 #include <time.h>
 #include <stdbool.h>

@@ -5,17 +5,15 @@ Tests on helper components for comparison methods to ensure they work correctly
 ========================================================================================*/
 #include <stdbool.h>
 
-#include "../EWENIT/EWENIT.c"
-#include "../strcompare/components/calc_groups.h"
-#include "../strcompare/components/utility_functions.h"
-#include "../strcompare/components/idx_ref.h"
+#include "../libs/EWENIT/EWENIT.c"
+#include "../src/components/calc_groups.h"
+#include "../src/components/utility_functions.h"
+#include "../src/components/idx_ref.h"
 
 
 /*=======================================================================================
 CalcGroup
 ========================================================================================*/
-
-CalcGroup* cg;
 
 // Test properties of CalcGroup_addNew
 void test_calc_groups_ADDNEW()
