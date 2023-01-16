@@ -263,13 +263,29 @@ void subset_test(double(*compare_func)(const char*, const char*))
 
 void extended_charset_test(double(*compare_func)(const char*, const char*))
 {
+    // Double test here - checks both score range and extended charset
+    // (128-255 chars)
+
+    // Note that one failure condition for this test is crashing
+    // Maybe I should come up with a different way?
     char* str1;
     char* str2;
+    double score;
     for (int i = 0; i < 1000; i++)
     {
         str1 = random_string_charset(CHARSET_EXTENDED);
         str2 = random_string_charset(CHARSET_EXTENDED);
-        compare_func(str1, str2);
+        score = compare_func(str1, str2);
+        if (score < 0 || score > 1)
+        {
+            TEST_FAIL_FMT(
+                "Extended Charset failed with score %f\n      %s\n      %s",
+                score, str1, str2
+            );
+            free(str1);
+            free(str2);
+            return;
+        }
         free(str1);
         free(str2);
     }
