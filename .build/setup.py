@@ -8,9 +8,7 @@ def main():
         name="strcompare",
         version="1.2.0",
         description="Methods to assess string similarity.",
-        ext_modules=[
-            Extension("strcompare", ["..\\strcompare\\strcompare_module.c"])
-        ]
+        ext_modules=[Extension("strcompare", ['..\\src\\strcompare_module.c'])]
     )
 
 
