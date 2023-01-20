@@ -11,7 +11,7 @@ long_description = (this_dir / "README.md").read_text()
 def main():
     setup(
         name="strcompare",
-        version="1.2.1",
+        version="1.2.2",
         description="Methods to assess string similarity.",
         readme="README.md",
         ext_modules=[Extension(
