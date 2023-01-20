@@ -3,8 +3,7 @@ calc_groups.h
 
 For use with method fss_score methods
 
-Calc group - stores a linked list of items representing character matches between
-str1 and str2.
+Calc group - Stores an array of structs representing substrings
 
 Each item in a CalcGroup represents a running substring whose relative order is common
 between str1 and str2.
@@ -22,7 +21,6 @@ Helper functions
 ========================================================================================*/
 
 // Finds the next power of 2 greater or equal to provided value
-// Note: I would make this static, but its use in the macros prevents that
 int next_pow2(unsigned int val)
 {
     if (val == 0)
@@ -45,7 +43,7 @@ int next_pow2(unsigned int val)
 Struct definition
 ========================================================================================*/
 
-// "private" struct holding indices and references to next linked _calcitem
+// "private" struct holding greatest indices of a substring
 typedef struct CalcItem {
     int idx1;
     int idx2;
@@ -53,8 +51,8 @@ typedef struct CalcItem {
 
 // Manager struct for CalcGroup
 typedef struct CalcGroup {
-    int idx2_min;           // Lowest idx2 on a _calcitem head
-    int length;             // Number of linked _calclist structs (# of groups)
+    int idx2_min;           // Lowest idx2 of any _calcitem
+    int length;             // Number of _calcitem elements in groups
     int matches;            // Total number of index matches found
     int offset_difference;  // Total difference in idx2 - idx1 offsets
 
