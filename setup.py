@@ -13,6 +13,7 @@ def main():
         name="strcompare",
         version="1.2.1",
         description="Methods to assess string similarity.",
+        readme="README.md",
         ext_modules=[Extension(
             name="strcompare",
             sources=['src\\strcompare_module.c'],
