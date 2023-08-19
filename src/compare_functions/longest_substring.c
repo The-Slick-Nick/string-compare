@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "compare_functions.h"
+#include "strcompare.h"
 #include "IdxRef.h"
 #include "max_min.h"
 

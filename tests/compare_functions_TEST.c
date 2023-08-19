@@ -14,7 +14,7 @@ Tests on string comparison methods
 
 #include "../libs/EWENIT/EWENIT.c"
 
-#include "../src/compare_functions/compare_functions.h"
+#include "../src/compare_functions/strcompare.h"
 
 #include "test_utils/random_string.h"
 #include "test_utils/compare_function_templates.h"
@@ -148,15 +148,36 @@ void test_adjusted_fss_score()
 }
 
 
-
-void test_levenshtein_score()
+void test_levenshtein_major()
 {
-    string_comparison_test(levenshtein_score);
-    // Manually tabulated examples
-    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("GUMBO", "GAMBOL"), (double)4/6);
-    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("KITTEN", "SITTING"), (double)4/7);
-    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_score("STRESSED", "DESSERT"), (double)3/8);
+    string_comparison_test(levenshtein_major);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_major("GUMBO", "GAMBOL"), (double)4/6);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_major("KITTEN", "SITTING"), (double)4/7);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_major("STRESSED", "DESSERT"), (double)3/8);
 }
+
+void test_levenshtein_minor()
+{
+    string_comparison_test(levenshtein_minor);
+    subset_test(levenshtein_minor);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_minor("GUMBO", "GAMBOL"), (double)4/5);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_minor("KITTEN", "SITTING"), (double)4/6);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_minor("STRESSED", "DESSERT"), (double)3/7);
+
+}
+
+void test_levenshtein_distance()
+{
+    ASSERT_EQUAL_INT(levenshtein_distance("GUMBO", "GAMBOL"), 4);
+    ASSERT_EQUAL_INT(levenshtein_distance("GAMBOL", "GUMBO"), 4);
+
+    ASSERT_EQUAL_INT(levenshtein_distance("KITTEN", "SITTING"), 4);
+    ASSERT_EQUAL_INT(levenshtein_distance("SITTING", "KITTEN"), 4);
+
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_distance("STRESSED", "DESSERT"), 3);
+    ASSERT_ALMOST_EQUAL_DOUBLE(levenshtein_distance("DESSERT", "STRESSED"), 3);
+}
+
 
 /* =======================================================================================
 MAIN
@@ -170,7 +191,10 @@ int main()
     ADD_CASE(test_lcs_score, "lcs_score");
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
-    ADD_CASE(test_levenshtein_score, "levenshtein score");
+
+
+    ADD_CASE(test_levenshtein_major, "levenshtein major");
+    ADD_CASE(test_levenshtein_minor, "levenshtein minor");
     EWENIT_END;
 
     return 0;

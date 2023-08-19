@@ -1,11 +1,11 @@
-/*----------------------------------------------------------------------------------------
-cdist_score.c
+/*========================================================================================
+character_distribution.c
 
 cdist_score
 Calculates the difference in character distributions between two strings
-----------------------------------------------------------------------------------------*/
+========================================================================================*/
 
-#include "compare_functions.h"
+#include "strcompare.h"
 #include <stdlib.h>
 
 double cdist_score(const char* str1, const char* str2)

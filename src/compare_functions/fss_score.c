@@ -36,7 +36,7 @@ adjusted_fss_score
 #include <string.h>
 #include <stdlib.h>
 
-#include "compare_functions.h"
+#include "strcompare.h"
 #include "max_min.h"
 
 
