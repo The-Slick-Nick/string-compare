@@ -1,4 +1,5 @@
 #include "max_min.h"
+#include <string.h>
 
 inline int imax(int a, int b)
 {

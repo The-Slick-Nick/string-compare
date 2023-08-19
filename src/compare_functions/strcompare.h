@@ -24,11 +24,16 @@ double levenshtein_major(const char* str1, const char* str2);
 double levenshtein_minor(const char* str1, const char* str2);
 
 
+double fss_major(const char* str1, const char* str2);
+double fss_minor(const char* str1, const char* str2);
+double adjusted_fss_major(const char* str1, const char* str2);
+double adjusted_fss_minor(const char* str1, const char* str2);
 
-double fss_score(const char* str1, const char* str2);
-double adjusted_fss_score(const char* str1, const char* str2);
-double naive_fss_score(const char* str1, const char* str2);
-double adjusted_naive_fss_score(const char* str1, const char* str2);
+
+// double fss_score(const char* str1, const char* str2);
+// double adjusted_fss_score(const char* str1, const char* str2);
+// double naive_fss_score(const char* str1, const char* str2);
+// double adjusted_naive_fss_score(const char* str1, const char* str2);
 double lcs_score(const char* str1, const char* str2);
 double naive_lcs_score(const char* str1, const char* str2);
 

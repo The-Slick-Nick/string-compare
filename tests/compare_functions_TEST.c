@@ -127,25 +127,71 @@ void test_lcs_score()
     }  
 }
 
-void test_fss_score()
+// void test_fss_score()
+// {
+//     string_comparison_test(fss_score);
+
+//     // Manually tabulated examples
+//     ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)4/8);
+//     ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)7/8);
+//     ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)6/8);
+
+// }
+
+void test_fss_major()
 {
-    string_comparison_test(fss_score);
+    string_comparison_test(fss_major);
 
     // Manually tabulated examples
-    ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)4/8);
-    ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)7/8);
-    ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)6/8);
-
+    ASSERT_EQUAL_DOUBLE(fss_major("REST", "STARE"), (double)2/5);
+    ASSERT_EQUAL_DOUBLE(fss_major("STRESSED", "DESSERT"), (double)4/8);
+    ASSERT_EQUAL_DOUBLE(fss_major("WREATHES", "WEATHERS"), (double)7/8);
+    ASSERT_EQUAL_DOUBLE(fss_major("ULTIMATE", "MUTILATE"), (double)6/8);
 }
 
-void test_adjusted_fss_score()
+void test_fss_minor()
 {
-    string_comparison_test(adjusted_fss_score);
+    string_comparison_test(fss_minor);
+    subset_test(fss_minor);
     // Manually tabulated examples
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)32/56);
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)54/64);
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)47/64);
+    ASSERT_EQUAL_DOUBLE(fss_minor("REST", "STARE"), (double)2/4);
+    ASSERT_EQUAL_DOUBLE(fss_minor("STRESSED", "DESSERT"), (double)4/7);
+    ASSERT_EQUAL_DOUBLE(fss_minor("WREATHES", "WEATHERS"), (double)7/8);
+    ASSERT_EQUAL_DOUBLE(fss_minor("ULTIMATE", "MUTILATE"), (double)6/8);
 }
+
+void test_adjusted_fss_major()
+{
+    string_comparison_test(adjusted_fss_major);
+    // Manually tabulated examples
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_major("REST", "STARE"), (double)8/20);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_major("STRESSED", "DESSERT"), (double)28/56);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_major("WREATHES", "WEATHERS"), (double)54/64);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_major("ULTIMATE", "MUTILATE"), (double)47/64);
+}
+
+void test_adjusted_fss_minor()
+{
+    string_comparison_test(adjusted_fss_major);
+    subset_test(adjusted_fss_minor);
+    // Manually tabulated examples
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_minor("REST", "STARE"), (double)10/20);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_minor("STRESSED", "DESSERT"), (double)32/56);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_minor("WREATHES", "WEATHERS"), (double)54/64);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_minor("ULTIMATE", "MUTILATE"), (double)47/64);
+}
+
+
+
+
+// void test_adjusted_fss_score()
+// {
+//     string_comparison_test(adjusted_fss_score);
+//     // Manually tabulated examples
+//     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)32/56);
+//     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)54/64);
+//     ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)47/64);
+// }
 
 
 void test_levenshtein_major()
@@ -189,9 +235,14 @@ int main()
     ADD_CASE(test_cdist_score, "cdist_score");
     ADD_CASE(test_naive_lcs_score, "naive_lcs_score");
     ADD_CASE(test_lcs_score, "lcs_score");
-    ADD_CASE(test_fss_score, "fss_score");
-    ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
+    // ADD_CASE(test_fss_score, "fss_score");
+    // ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
 
+
+    ADD_CASE(test_fss_major, "fss major");
+    ADD_CASE(test_fss_minor, "fss minor");
+    ADD_CASE(test_adjusted_fss_major, "adjusted fss major");
+    ADD_CASE(test_adjusted_fss_minor, "adjusted fss minor");
 
     ADD_CASE(test_levenshtein_major, "levenshtein major");
     ADD_CASE(test_levenshtein_minor, "levenshtein minor");
