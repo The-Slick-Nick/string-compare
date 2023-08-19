@@ -9,9 +9,9 @@ Assertion functions revolving around doubleing point numbers
 #include <math.h>
 
 #define ALMOST_EQUAL_DOUBLE(val1, val2) \
-    fabs(val1 - val2) <= (\
+    (fabs(val1 - val2) <= (\
     (fabs(val1) < fabs(val2) ? fabs(val2) : fabs(val1)) * DBL_EPSILON\
-    )
+    ))
 
 
 // Compares two doubles for exact equality

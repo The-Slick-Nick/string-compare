@@ -81,7 +81,7 @@ void reversibility_test(double(*compare_func)(const char*, const char*))
         score2 = compare_func(str2, str1);
         if (score1 != score2)
         {
-            TEST_FAIL_FMT("Reversibility test failed\n      %s\n      %s", str1, str2);
+            TEST_FAIL_FMT("Reversibility test failed\n      %f vs %f\n      %s\n      %s", score1, score2, str1, str2);
             free(str1);
             free(str2);
             return;
@@ -172,7 +172,7 @@ void benchmark_test(double(*compare_func)(const char*, const char*))
     
     t_start = clock();
 
-    // 100k passes
+    // 10k passes
     for (int num_tests = 0; num_tests < 10000; num_tests++)
     {
 
@@ -194,7 +194,7 @@ void benchmark_test(double(*compare_func)(const char*, const char*))
         t_end = clock();
         time_taken += ((double)(t_end - t_start)) / CLOCKS_PER_SEC;
     }
-    // 100k passes should be done in less than a second
+    // 10k passes should be done in less than a second
     TEST_PASS_FMT(
         "Benchmark test succeeded: 10000 tests completed in %f seconds", time_taken
     );

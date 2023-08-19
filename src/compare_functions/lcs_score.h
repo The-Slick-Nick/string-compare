@@ -17,6 +17,7 @@ to the length of the shorter string
 #include "../components/utility_functions.h"
 #include "../components/idx_ref.h"
 
+
 // Longest Common Substring score
 double lcs_score(const char* str1, const char* str2)
 {
@@ -80,6 +81,7 @@ double lcs_score(const char* str1, const char* str2)
         }
     }
 
+    // Free IdxRef's 
     IdxRef_deconstruct(&iref);
 
     // Return

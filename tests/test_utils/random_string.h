@@ -68,7 +68,7 @@ char* random_string_charset(int char_set)
                 this_char = 97 + rand() % (127 - 97);
                 break;
             case CHARSET_EXTENDED: // 128-255
-                this_char = 128 + rand() & (255 - 128);
+                this_char = 128 + rand() % (255 - 128);
                 break;
         }
         *(return_str + i) = (char)this_char;

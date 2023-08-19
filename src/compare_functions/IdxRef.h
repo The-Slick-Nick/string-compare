@@ -1,5 +1,5 @@
 /*=======================================================================================
-idx_ref.h
+IdxRef.h
 
 Framework for tracking the indices (by character) for characters in a given model string
 
@@ -29,10 +29,10 @@ chr_counts              ptr_ref             idx_arr
                                             3       3       (a, SECOND_IDX)    
                                             4       2       (v, FIRST_IDX)      
 ========================================================================================*/
+
 #ifndef INCLUDE_GUARD_IDXREF
 #define INCLUDE_GUARD_IDXREF
-#include <stdlib.h>
-
+#include <stdbool.h>
 
 /*=======================================================================================
 Structure Definition
@@ -42,6 +42,7 @@ typedef struct {
     int* chr_counts;        // Array of counts per character
     int* ptr_ref;           // Array of pointer offsets per character to look into idx_arr
     int* idx_arr;           // Array of all indices found for a provided string
+    bool active;            // Flag indicating if IdxRef is ready for use.
 } IdxRef;
 
 
@@ -49,76 +50,39 @@ typedef struct {
 Public methods
 ========================================================================================*/
 
-// Build an index reference based on a provided string. Also required to pass
-// two 256-sized arrays, initialized to 0 chr_counts and ptr_ref
-void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref)
-{
-    int i;
-    unsigned char chri;
-    int current_offset;
-    int total_size = 0;
-    int min_idx[256] = {0};
-
-    // Point IdxRef tracking arrays to those passed
-    self->chr_counts = chr_counts;
-    self->ptr_ref = ptr_ref;
-
-    // Gather information about str before building
-    for (i = 0; *(str + i) != '\0'; i++)
-    {
-        chri = (unsigned char)(*(str + i));
-        total_size++;
-        self->chr_counts[chri]++;
-    }
-
-    // One malloc
-    // pointer ref 0 used as invalid, reserve index 0 for N/A.
-    self->idx_arr = (int*)malloc((1 + total_size) * sizeof(int));
-    current_offset = 1;
-
-    for (i = 0; *(str + i) != '\0'; i++)
-    {
-        chri = (unsigned char)(*(str + i));
-        // If still 0 (from allocation), we haven't pointed this char to a block yet
-        if (self->ptr_ref[chri] == 0)
-        // if (*(self->ptr_ref + chri) == 0)
-        {
-            // Assign next available block to current character (at current_offset)
-            self->ptr_ref[chri] = current_offset;
-            // Set current_offset to start of next available block
-            // current_offset += *(self->chr_counts +chri);
-            current_offset += self->chr_counts[chri];
-        }
-
-
-        *(self->idx_arr + self->ptr_ref[chri] + min_idx[chri]) = i;
-        min_idx[chri]++;
-    }
-}
+/// @brief Builds an existing IdxRef struct based on a basis string.
+/// It is the responsibility of the caller to ensure IdxRef_deconstruct is called
+/// for every IdxRef that is built.
+/// @param self Pointer to existing, uninitialized IdxRef struct.
+/// @param str Basis string to build from.
+/// @param chr_counts 256-sized integer array, already initialzied to 0s
+/// @param ptr_ref 256-sized integer array, already initialized to 0s
+void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref);
 
 // Retrieve ith index for a given character from idx_ref 
-int IdxRef_getIndex(IdxRef* self, unsigned char chr, int chr_num)
-{
-    return *(self->idx_arr + self->ptr_ref[chr] + chr_num);
-}
 
-// Set the ith index for a given character in idx_ref to a new value
-void IdxRef_updateIndex(
-    IdxRef* self, unsigned char chr, int chr_num, int new_val
-)
-{
-    *(self->idx_arr + self->ptr_ref[chr] + chr_num) = new_val;
-}
+/// @brief Get the index of the desired instance number of the provided character.
+/// If not enough instances of provided character exist, return -1.
+/// For example, for basis string FOLLOW, calling IdxRef_getIndex()
+/// @param self Pointer to initialized IdxRef struct.
+/// @param chr Character to look for.
+/// @param chr_num Instance number of said character to return an index for.
+/// @return Integer index that this instance of this character appears in basis string.
+int IdxRef_getIndex(IdxRef* self, unsigned char chr, int chr_num);
 
-// Retrive the number of instances of a provided character
-int IdxRef_getChrCount(IdxRef* self, unsigned char chr)
-{
-    return self->chr_counts[chr];
-}
 
-void IdxRef_deconstruct(IdxRef* self)
-{
-    free(self->idx_arr);
-}
+/// @brief Get the number of instances that the provided character appears in the basis
+/// string.
+/// @param self Pointer to initialized IdxRef struct. 
+/// @param chr Character whose count to return.
+/// @return Integer representing the number of times this character appears in basis
+/// string.
+int IdxRef_getChrCount(IdxRef* self, unsigned char chr);
+
+/// @brief Decomissions an IdxRef struct. Frees internally allocated memory. Must be 
+/// called on any IdxRef that has been provided to IdxRef_build
+/// @param self Pointer to IdxRef struct to deconstruct.
+void IdxRef_deconstruct(IdxRef* self);
+
 
 #endif

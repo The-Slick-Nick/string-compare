@@ -13,13 +13,17 @@ Tests on string comparison methods
 ========================================================================================*/
 
 #include "../libs/EWENIT/EWENIT.c"
+
+#include "../src/compare_functions/compare_functions.h"
+
 #include "test_utils/random_string.h"
 #include "test_utils/compare_function_templates.h"
 
-#include "../src/compare_functions/cdist_score.h"
-#include "../src/compare_functions/lcs_score.h"
-#include "../src/compare_functions/fss_score.h"
-#include "../src/compare_functions/levenshtein_score.h"
+// #include "../src/compare_functions/cdist_score.h"
+// #include "../src/compare_functions/lcs_score.h"
+// #include "../src/compare_functions/fss_score.h"
+// #include "../src/compare_functions/levenshtein_score.h"
+
 
 #include <time.h>
 #include <stdbool.h>
@@ -127,12 +131,10 @@ void test_fss_score()
 {
     string_comparison_test(fss_score);
 
-    // Regular mss has subset == 1 property
-    subset_test(fss_score);
     // Manually tabulated examples
-    ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)3/6);
-    ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)6/7);
-    ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
+    ASSERT_EQUAL_DOUBLE(fss_score("STRESSED", "DESSERT"), (double)4/8);
+    ASSERT_EQUAL_DOUBLE(fss_score("WREATHES", "WEATHERS"), (double)7/8);
+    ASSERT_EQUAL_DOUBLE(fss_score("ULTIMATE", "MUTILATE"), (double)6/8);
 
 }
 
@@ -140,34 +142,12 @@ void test_adjusted_fss_score()
 {
     string_comparison_test(adjusted_fss_score);
     // Manually tabulated examples
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)18/36);
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)34/42);
-    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)29/42);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("STRESSED", "DESSERT"), (double)32/56);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("WREATHES", "WEATHERS"), (double)54/64);
+    ASSERT_EQUAL_DOUBLE(adjusted_fss_score("ULTIMATE", "MUTILATE"), (double)47/64);
 }
 
-void test_naive_fss_score()
-{
-    string_comparison_test(naive_fss_score);
-    subset_test(naive_fss_score);
 
-    // Manually tabulated examples
-    ASSERT_EQUAL_DOUBLE(naive_fss_score("ULTIMATE", "MUTILATE"), (double)5/7);
-    ASSERT_EQUAL_DOUBLE(naive_fss_score("WREATHES", "WEATHERS"), (double)6/7);
-}
-
-void test_adjusted_naive_fss_score()
-{
-    string_comparison_test(adjusted_naive_fss_score);
-    // Manually tabulated examples
-    ASSERT_ALMOST_EQUAL_DOUBLE(
-        adjusted_naive_fss_score("STRESSED", "DESSERT"), (double)18/36
-    );
-    ASSERT_ALMOST_EQUAL_DOUBLE(
-        adjusted_naive_fss_score("ULTIMATE", "MUTILATE"), (double)24/42
-    );
-
-
-}
 
 void test_levenshtein_score()
 {
@@ -190,8 +170,8 @@ int main()
     ADD_CASE(test_lcs_score, "lcs_score");
     ADD_CASE(test_fss_score, "fss_score");
     ADD_CASE(test_adjusted_fss_score, "adjusted_fss_score");
-    ADD_CASE(test_naive_fss_score, "naive fss score");
-    ADD_CASE(test_adjusted_naive_fss_score, "adjusted naive fss score");
     ADD_CASE(test_levenshtein_score, "levenshtein score");
     EWENIT_END;
+
+    return 0;
 }

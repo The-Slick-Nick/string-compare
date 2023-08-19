@@ -243,7 +243,7 @@ void _assertionitem_print(_assertionitem* ass)
     if (ass == NULL)
         return;
 
-    printf("[%ld] ", ass->line_num);
+    printf("[%d] ", ass->line_num);
     switch (ass->status_code)
     {
         case STATUS_CODE_PASS:

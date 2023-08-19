@@ -11,9 +11,9 @@ int assert_equal_str(TestSuite* ts, char* val1, char* val2, long line_num)
     int idx;
     int len1 = strlen(val1);
     int len2 = strlen(val2);
-    int return_code;
+    // int return_code;
     char chr1, chr2;
-    char* msg;
+    // char* msg;
 
     if (len1 != len2)
         return TestSuite_fail(

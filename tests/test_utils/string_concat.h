@@ -21,7 +21,7 @@ char* string_concat(int num_strings, ...)
     char* loop_str;
     char* to_return;
 
-    int idx_arg;
+    // int idx_arg;
     int idx_return = 0;
 
     // calculate total length for allocation
