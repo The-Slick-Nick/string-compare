@@ -23,7 +23,7 @@ module_sources.append("src\\strcompare_module.c")
 def main():
     setup(
         name="strcompare",
-        version="2.0.0",
+        version="2.0.1",
         description="Methods to assess string similarity.",
         readme="README.md",
         ext_modules=[Extension(
