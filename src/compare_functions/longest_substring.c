@@ -10,7 +10,7 @@ Internal Declarations
 ========================================================================================*/
 
 static int _longestSubstring(
-    const char* str1, const char* str2, int len1, int len2, char* destination
+    const char* str1, const char* str2, int len1, int len2, int* substrIdx
 );
 static int _substringLength(const char* str1, const char* str2, int idx1, int idx2);
 
@@ -35,7 +35,7 @@ Internal Definitions
 /// neede, pass a NULL value here.
 /// @return 
 static int _longestSubstring(
-    const char* str1, const char* str2, int len1, int len2, char* destination
+    const char* str1, const char* str2, int len1, int len2, int* substrIdx
 )
 {
 
@@ -83,16 +83,8 @@ static int _longestSubstring(
     }
 
     IdxRef_deconstruct(&iref);
-    if (destination != NULL)
-    {
-        idx1 = bestIdx;
-        for (int returnIdx = 0; returnIdx < max_substr_score; returnIdx++)
-        {
-            destination[returnIdx] = str1[idx1];
-            idx1++;
-        }
-        destination[max_substr_score] = '\0';  // escape character
-    }
+    if (substrIdx != NULL)
+        *substrIdx = bestIdx;
 
     return max_substr_score;
 
@@ -192,10 +184,9 @@ double lss_minor(const char* str1, const char* str2)
 }
 
 
-// Returns the length of the string found. If destination is not NULL,
-// writes the resulting longest substring to it (or as much as is possible, if
-// destination is too small)
-int longest_substring(const char* str1, const char* str2, char* destination)
+// Returns the length of the longest substring found. Writes the index in str1
+// where it first appears into substrIdx
+int longest_substring(const char* str1, const char* str2, int* substrIdx)
 {
     int len1 = strlen(str1);
     int len2 = strlen(str2);
@@ -203,17 +194,28 @@ int longest_substring(const char* str1, const char* str2, char* destination)
 
     if ((len1 == 0) || (len2 == 0))
     {
-        destination[0] = '\0';
+        *substrIdx = 0;
         return 0;
     }
 
-    if (len1 > len2)
-        longestLen = _longestSubstring(str2, str1, len2, len1, destination);
-    else
-        longestLen = _longestSubstring(str1, str2, len1, len2, destination);
-
+    // Note that we do not control for length here, so caller knows which string
+    // substrIdx is provided for
+    longestLen = _longestSubstring(str1, str2, len1, len2, substrIdx);
     if (longestLen < 0)
         return -1;
 
     return longestLen;
+}
+
+
+// Sister method to longest_substring. Using the information provided/returned,
+// slices string into a substring based on length, pushing contents into destination.
+int build_substring(const char* str, int substrIdx, int substrLen, char* destination)
+{
+    for (int i = 0; i < substrLen; i++)
+    {
+        destination[i] = str[substrIdx];
+        substrIdx++;
+    }
+    destination[substrLen] = '\0';
 }

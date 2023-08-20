@@ -29,7 +29,8 @@ double adjusted_fss_major(const char* str1, const char* str2);
 double adjusted_fss_minor(const char* str1, const char* str2);
 
 
-int longest_substring(const char* str1, const char* str2, char* destination);
+int longest_substring(const char* str1, const char* str2, int* substrIdx);
+int build_substring(const char* str, int substrIdx, int substrLen, char* destination);
 double lss_major(const char* str1, const char* str2);
 double lss_minor(const char* str1, const char* str2);
 

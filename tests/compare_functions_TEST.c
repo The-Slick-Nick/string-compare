@@ -325,21 +325,34 @@ void test_cdist_score()
 
 void test_longest_substring()
 {
-    char buffer[32];
+    int idx;
+    int len;
+    char buffer[256];
 
-    ASSERT_EQUAL_INT(longest_substring("dessert", "stressed", buffer), 4);  // esse
+    len = longest_substring("dessert", "stressed", &idx);
+    build_substring("dessert", idx, len, buffer);
+    ASSERT_EQUAL_INT(len, 4);
     ASSERT_EQUAL_STR(buffer, "esse");
 
-    ASSERT_EQUAL_INT(longest_substring("hello", "", buffer), 0);
+    len = longest_substring("hello", "", &idx);
+    build_substring("hello", idx, len, buffer);
+    ASSERT_EQUAL_INT(len, 0);
     ASSERT_EQUAL_STR(buffer, "");
 
-    ASSERT_EQUAL_INT(longest_substring("", "", buffer), 0);
+
+    len = longest_substring("", "", &idx);
+    build_substring("", idx, len, buffer);
+    ASSERT_EQUAL_INT(len, 0);
     ASSERT_EQUAL_STR(buffer, "");
 
-    ASSERT_EQUAL_INT(longest_substring("ultimate", "mutilate", buffer), 3);
+    len = longest_substring("ultimate", "mutilate", &idx);
+    build_substring("ultimate", idx, len, buffer);
+    ASSERT_EQUAL_INT(len, 3);
     ASSERT_EQUAL_STR(buffer, "ate");
 
-    ASSERT_EQUAL_INT(longest_substring("bring", "brung", buffer), 2);
+    len = longest_substring("bring", "brung", &idx);
+    build_substring("bring", idx, len, buffer);
+    ASSERT_EQUAL_INT(len, 2);
     ASSERT_EQUAL_STR(buffer, "br");  // picks first instance of 2
 }
 
