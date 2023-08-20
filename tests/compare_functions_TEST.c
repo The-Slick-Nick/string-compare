@@ -27,20 +27,20 @@ double time_comparison_func(
 
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
 
     start = clock();
 
     for (int i = 0; i < num_tests; i++)
     {
-        str1 = random_string();
-        str2 = random_string();
+        str1 = random_string(buffer1);
+        str2 = random_string(buffer2);
         // Make sure to only time the comparison portion
         start = clock();
         compare_func(str1, str2);
         end = clock();
         time_taken += ((double)(end - start)) / CLOCKS_PER_SEC;
-        free(str1);
-        free(str2);
     }
     return time_taken;
 }
@@ -55,14 +55,14 @@ void exact_equality_test(double(*compare_func)(const char*, const char*))
 {
     char* test_str;
     double score;
+    char buffer[RANDOMSTR_MAX_LENGTH];
     for (int i = 0; i < 1000; i++)
     {
-        test_str = random_string();
+        test_str = random_string(buffer);
         score = compare_func(test_str, test_str);
         if (score != 1.0)
         {
             TEST_FAIL_FMT("Equality test failed: %f \n      %s", score, test_str);
-            free(test_str);
             return;
         }
     }
@@ -74,24 +74,22 @@ void reversibility_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
     double score1;
     double score2;
     for (int i = 0; i < 1000; i++)
     {
-        str1 = random_string();
-        str2 = random_string();
+        str1 = random_string(buffer1);
+        str2 = random_string(buffer2);
         score1 = compare_func(str1, str2);
         score2 = compare_func(str2, str1);
         if (score1 != score2)
         {
             TEST_FAIL_FMT("Reversibility test failed\n      %f vs %f\n      %s\n      %s", score1, score2, str1, str2);
-            free(str1);
-            free(str2);
             return;
         }
     }
-    free(str1);
-    free(str2);
     TEST_PASS("Reversibility test passed for all 1,000 tests");
 }
 
@@ -100,20 +98,18 @@ void inequality_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
     for (int i = 0; i < 1000; i++)
     {
-        str1 = random_string_charset(CHARSET_NUMBERS);
-        str2 = random_string_charset(CHARSET_UPPERCASE);
+        str1 = random_string_charset(buffer1, CHARSET_NUMBERS);
+        str2 = random_string_charset(buffer2, CHARSET_UPPERCASE);
         if (compare_func(str1, str2) != 0.0)
         {
             TEST_FAIL_FMT("Inequality test failed\n      %s\n      %s", str1, str2);
-            free(str1);
-            free(str2);
             return;
         }
     }
-    free(str1);
-    free(str2);
     TEST_PASS("Inequality test passed for all 1,000 tests");
 }
 
@@ -121,19 +117,18 @@ void inequality_test(double(*compare_func)(const char*, const char*))
 void one_empty_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
     double score;
     for (int i = 0; i < 100; i++)
     {
-        str1 = random_string();
+        str1 = random_string(buffer1);
         score = compare_func(str1, "");
         if (score != 0)
         {
             TEST_FAIL_FMT("Empty string test failed: Score %f on string %s", score, str1);
-            free(str1);
             return;
         }
     }
-    free(str1);
     TEST_PASS("Empty string test passed for all 1,000 tests");
 }
 
@@ -142,24 +137,22 @@ void score_range_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
     double score;
     for (int i = 0; i < 1000; i++)
     {
-        str1 = random_string();
-        str2 = random_string();
+        str1 = random_string(buffer1);
+        str2 = random_string(buffer2);
         score = compare_func(str1, str2);
         if (score < 0.0 || score > 1.0)
         {
             TEST_FAIL_FMT(
                 "Score range failed: %f on \n      %s\n      %s", score, str1, str2
             );
-            free(str1);
-            free(str2);
             return;
         }
     }
-    free(str1);
-    free(str2);
     TEST_PASS("Score range met for all 1,000 tests");
 
 }
@@ -169,6 +162,8 @@ void benchmark_test(double(*compare_func)(const char*, const char*))
 {
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
 
     clock_t t_start, t_end;
     double time_taken = 0;
@@ -179,16 +174,14 @@ void benchmark_test(double(*compare_func)(const char*, const char*))
     for (int num_tests = 0; num_tests < 10000; num_tests++)
     {
 
-        str1 = random_string();
-        str2 = random_string();
+        str1 = random_string(buffer1);
+        str2 = random_string(buffer2);
         if (time_taken > 1.0)
         {
             TEST_FAIL_FMT(
                 "Benchmark test failed: %d out of 10000 tests in 1 second",
                 num_tests
             );
-            free(str1);
-            free(str2);
             return;
         }
         // Only time the comparison portion
@@ -201,8 +194,6 @@ void benchmark_test(double(*compare_func)(const char*, const char*))
     TEST_PASS_FMT(
         "Benchmark test succeeded: 10000 tests completed in %f seconds", time_taken
     );
-    free(str1);
-    free(str2);
 }
 
 // test that funct(str1, str2) == 1.0 if str1 is a subset of str2 or vice versa
@@ -214,6 +205,12 @@ void subset_test(double(*compare_func)(const char*, const char*))
     char* suffix;
     char* to_compare;
 
+    char bufferBase[RANDOMSTR_MAX_LENGTH];
+    char bufferPrefix[RANDOMSTR_MAX_LENGTH];
+    char bufferSuffix[RANDOMSTR_MAX_LENGTH];
+
+    char bufferConcat[3 * RANDOMSTR_MAX_LENGTH];
+
     int substr_type; // randomly generated, 0-2
                      // 0 - prefix, 1 - suffix, 2 - both
 
@@ -223,23 +220,23 @@ void subset_test(double(*compare_func)(const char*, const char*))
     for (int i = 0; i < 1000; i++)
     {
         substr_type = rand() % 3;
-        base_str = random_string();
-        prefix = random_string();
-        suffix = random_string();
+        base_str = random_string(bufferBase);
+        prefix = random_string(bufferPrefix);
+        suffix = random_string(bufferSuffix);
         switch (substr_type)
         {
 
             case 0:  // Prefix
-                to_compare = string_concat(2, prefix, base_str);
+                to_compare = string_concat(bufferConcat, 2, prefix, base_str);
                 break;
             case 1:  // Suffix
-                to_compare = string_concat(2, base_str, suffix);
+                to_compare = string_concat(bufferConcat, 2, base_str, suffix);
                 break;
             case 2:
-                to_compare = string_concat(3, prefix, base_str, suffix);
+                to_compare = string_concat(bufferConcat, 3, prefix, base_str, suffix);
                 break;
             default:
-                strcpy(to_compare, base_str);
+                to_compare = strcpy(bufferConcat, base_str);
         }
 
         score = compare_func(base_str, to_compare);
@@ -250,18 +247,10 @@ void subset_test(double(*compare_func)(const char*, const char*))
                 "Subset score not 1.0 on strings\n      %s\n      %s",
                 base_str, to_compare
             );
-            free(base_str);
-            free(prefix);
-            free(suffix);
-            free(to_compare);
             return;
         }
     }
     TEST_PASS("Subset test passed on all 1,000 tests");
-    free(base_str);
-    free(prefix);
-    free(suffix);
-    free(to_compare);
 }
 
 void extended_charset_test(double(*compare_func)(const char*, const char*))
@@ -273,11 +262,13 @@ void extended_charset_test(double(*compare_func)(const char*, const char*))
     // Maybe I should come up with a different way?
     char* str1;
     char* str2;
+    char buffer1[RANDOMSTR_MAX_LENGTH];
+    char buffer2[RANDOMSTR_MAX_LENGTH];
     double score;
     for (int i = 0; i < 1000; i++)
     {
-        str1 = random_string_charset(CHARSET_EXTENDED);
-        str2 = random_string_charset(CHARSET_EXTENDED);
+        str1 = random_string_charset(buffer1, CHARSET_EXTENDED);
+        str2 = random_string_charset(buffer2, CHARSET_EXTENDED);
         score = compare_func(str1, str2);
         if (score < 0 || score > 1)
         {
@@ -285,12 +276,8 @@ void extended_charset_test(double(*compare_func)(const char*, const char*))
                 "Extended Charset failed with score %f\n      %s\n      %s",
                 score, str1, str2
             );
-            free(str1);
-            free(str2);
             return;
         }
-        free(str1);
-        free(str2);
     }
     TEST_PASS("Extended charsets supported over 1000 tests");
 }
@@ -325,33 +312,40 @@ void test_cdist_score()
 
 void test_longest_substring()
 {
-    int idx;
     int len;
+    const char* substr;
     char buffer[256];
 
-    len = longest_substring("dessert", "stressed", &idx);
-    build_substring("dessert", idx, len, buffer);
+    // test with shorter string first
+    len = longest_substring("dessert", "stressed", &substr);
+    substring(buffer, substr, len);
     ASSERT_EQUAL_INT(len, 4);
     ASSERT_EQUAL_STR(buffer, "esse");
 
-    len = longest_substring("hello", "", &idx);
-    build_substring("hello", idx, len, buffer);
+    // test with shorter string second
+    len = longest_substring("stressed", "dessert", &substr);
+    substring(buffer, substr, len);
+    ASSERT_EQUAL_INT(len, 4);
+    ASSERT_EQUAL_STR(buffer, "esse");
+
+    len = longest_substring("hello", "", &substr);
+    substring(buffer, substr, len);
     ASSERT_EQUAL_INT(len, 0);
     ASSERT_EQUAL_STR(buffer, "");
 
 
-    len = longest_substring("", "", &idx);
-    build_substring("", idx, len, buffer);
+    len = longest_substring("", "", &substr);
+    substring(buffer, substr, len);
     ASSERT_EQUAL_INT(len, 0);
     ASSERT_EQUAL_STR(buffer, "");
 
-    len = longest_substring("ultimate", "mutilate", &idx);
-    build_substring("ultimate", idx, len, buffer);
+    len = longest_substring("ultimate", "mutilate", &substr);
+    substring(buffer, substr, len);
     ASSERT_EQUAL_INT(len, 3);
     ASSERT_EQUAL_STR(buffer, "ate");
 
-    len = longest_substring("bring", "brung", &idx);
-    build_substring("bring", idx, len, buffer);
+    len = longest_substring("bring", "brung", &substr);
+    substring(buffer, substr, len);
     ASSERT_EQUAL_INT(len, 2);
     ASSERT_EQUAL_STR(buffer, "br");  // picks first instance of 2
 }

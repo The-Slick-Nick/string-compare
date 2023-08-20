@@ -39,6 +39,7 @@ levenshtein.c
 Wrap C functions into python object returning functions
 ========================================================================================*/
 
+// Wrap cdist_score
 static PyObject* method_cdist_score(PyObject* self, PyObject *args)
 {
     char *str1, *str2;
@@ -51,6 +52,7 @@ static PyObject* method_cdist_score(PyObject* self, PyObject *args)
     return PyFloat_FromDouble(score);
 }
 
+// Wrap lss_major
 static PyObject* method_lss_major(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -71,7 +73,7 @@ static PyObject* method_lss_major(PyObject* self, PyObject* args)
     return PyFloat_FromDouble(score);
 }
 
-
+// Wrap lss_minor
 static PyObject* method_lss_minor(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -92,7 +94,7 @@ static PyObject* method_lss_minor(PyObject* self, PyObject* args)
     return PyFloat_FromDouble(score);
 }
 
-
+// Wrap return value of longest_substring
 static PyObject* method_substring_length(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -122,45 +124,33 @@ static PyObject* method_substring_length(PyObject* self, PyObject* args)
     return PyLong_FromLong((long)length);
 }
 
+// Wraps longest_substring - makes use of the "substr" argument & return value to 
+// use PyUnicode_FromStringAndSize
 static PyObject* method_longest_substring(PyObject* self, PyObject* args)
 {
     char* str1;
     char* str2;
+    char* substr;
     int substrLen;
-    int substrIdx;
     PyObject* returnVal;
 
     if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
         return NULL;
 
-    substrLen = longest_substring(str1, str2, &substrIdx);
+    substrLen = longest_substring(str1, str2, &substr);
 
     if (substrLen < 0)
     {
-        PyErr_SetString(PyExc_MemoryError, "Error allocating memory for longest_substring.");
+        PyErr_SetString(
+            PyExc_MemoryError, "Error allocating memory for longest_substring."
+        );
         return NULL;
     }
 
-    if (substrLen > 255)
-    {
-        char* substr = (char*)malloc((1 + substrLen) * sizeof(char));
-        if (substr == NULL)
-        {
-            PyErr_SetString(PyExc_MemoryError, "Error allocating memory for longest_substring.");
-            return NULL;
-        }
-        build_substring(str1, substrIdx, substrLen, substr);
-        returnVal = PyUnicode_FromString(substr);
-        free(substr);
-        return returnVal;
-    }
-
-    char substr[256];
-    build_substring(str1, substrIdx, substrLen, substr);
-    return PyUnicode_FromString(substr);
+    return PyUnicode_FromStringAndSize(substr, substrLen);
 }
 
-
+// Wraps fss_major
 static PyObject* method_fss_major(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -181,6 +171,7 @@ static PyObject* method_fss_major(PyObject* self, PyObject* args)
     return PyFloat_FromDouble(score);
 }
 
+// Wraps fss_minor
 static PyObject* method_fss_minor(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -201,6 +192,51 @@ static PyObject* method_fss_minor(PyObject* self, PyObject* args)
     return Pyfloat_FromDouble(score);
 }
 
+// Wraps adjusted_fss_major
+static PyObject* method_adjusted_fss_major(PyObject* self, PyObject* args)
+{
+    char* str1;
+    char* str2;
+    double score;
+
+    if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
+        return NULL;
+
+    score = adjusted_fss_major(str1, str2);
+    if (score < 0)
+    {
+        PyErr_SetString(
+            PyExc_MemoryError, "Error allocating memory for adjusted_fss_major."
+        );
+        return NULL;
+    }
+
+    return PyFloat_FromDouble(score);
+}
+
+// Wraps adjusted_fss_minor
+static PyObject* method_adjusted_fss_minor(PyObject* self, PyObject* args)
+{
+    char* str1;
+    char* str2;
+    double score;
+
+    if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
+        return NULL;
+
+    score = adjusted_fss_major(str1, str2);
+    if (score < 0)
+    {
+        PyErr_SetString(
+            PyExc_MemoryError, "Error allocating memory for adjusted_fss_minor."
+        );
+        return NULL;
+    }
+
+    return PyFloat_FromDouble(score);
+}
+
+// Wraps levenshtein_distance
 static PyObject* method_levenshtein_distance(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -220,6 +256,7 @@ static PyObject* method_levenshtein_distance(PyObject* self, PyObject* args)
     return PyLong_FromLong((long)len);
 }
 
+// Wraps levenshtein_major
 static PyObject* method_levenshtein_major(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -240,6 +277,7 @@ static PyObject* method_levenshtein_major(PyObject* self, PyObject* args)
     return Pyfloat_FromDouble(score);
 }
 
+// Wraps levenshtein_minor
 static PyObject* method_levenshtein_minor(PyObject* self, PyObject* args)
 {
     char* str1;
@@ -268,48 +306,93 @@ static PyMethodDef strcompare_methods[] = {
     {
         "cdist_score", method_cdist_score, METH_VARARGS,
         "Character Distribution Score. Compares the character distribution between two "
-        "strings.",
+        "input strings, returning a float representing the ratio of matched characters "
+        "to the total number of characters between the two strings."
     },
     {
-        "fss_score", method_fss_score, METH_VARARGS,
-        "Fractured Substring Score. Identifies sequences of characters with the same "
-        "relative order bewteen two strings"
+        "lss_major", method_lss_major, METH_VARARGS,
+        "Longest Substring Score - Major variant. Assesses the similarity of two input "
+        "strings by comparing the length of the longest substring common to both, "
+        "returning a float representing the ratio of the longest substring's length to "
+        "the length of the longer input string."
     },
     {
-        "adjusted_fss_score", method_adjusted_fss_score, METH_VARARGS,
-        "Adjusted Fractured Substring Score. Identifies sequences of characters with the "
-        "same relative order between two strings, adjusted for differences in distances "
-        "between two matching characters in the first and second."
+        "lss_minor", method_lss_minor, METH_VARARGS,
+        "Longest Substring Score - Minor variant. Assesses the similarity of two input strings by "
+        "comparing the length of the longest substring common to both, returning a float "
+        "representing the ratio of the longest substring's length to the length of the "
+        "shorter input string."
     },
     {
-        "naive_fss_score", method_naive_fss_score, METH_VARARGS,
-        "Naive Fractured Substring Score. Employes a naive algorithm to identify "
-        "sequences of characters with the same relative order between two strings."
+        "substring_length", method_substring_length, METH_VARARGS,
+        "Substring Length. Identifies and returns the length of the longest substring "
+        "common to both input strings. Returns 0 if there are no characters common to "
+        "both input strings."
     },
     {
-        "adjusted_naive_fss_score", method_adjusted_naive_fss_score, METH_VARARGS,
-        "Naive Adjusted Fractured Substring Score. Employes a naive algorithm to "
-        "identify sequences of characters with the same relative order between two "
-        "strings, while also correcting for differences in index offsets between those "
-        "characters in the first and second strings."
+        "longest_substring", method_longest_substring, METH_VARARGS,
+        "Longest Substring. Identifies and returns the longest sequence of characters "
+        "appearing in the same order in both input strings. Returns an empty string if "
+        "there are no matching characters between the two input strings."
     },
     {
-        "lcs_score", method_lcs_score, METH_VARARGS,
-        "Longest Common Substring Score. Assesses similarity between two strings by "
-        "identifying the longest substring common to both strings."
+        "fss_major", method_fss_major, METH_VARARGS,
+        "Fragmented Substring Score - Major variant. Assesses the similarity of two "
+        "input strings by identifying the longest sequence of characters that appear "
+        "in the same relative order in both input strings, returning a float "
+        "representing the ratio of the longest fragmented substring's length to the "
+        "length of the longer string."
     },
     {
-        "naive_lcs_score", method_naive_lcs_score, METH_VARARGS,
-        "Naive Longest Common Substring Score. Employs a naive algorithm to "
-        "assess the similarity of two strings by identifying the longest substring "
-        "common to both strings."
+        "fss_minor", method_fss_minor, METH_VARARGS,
+        "Fragmented Substring Score - Minor variant. Assesses the similarity of two "
+        "input strings by identifying the longest sequence of characters that appear "
+        "in the same relative order in both input strings, returning a float "
+        "representing the ratio of the longest fragmented substring's length to the "
+        "length of the shorter string."
     },
     {
-        "levenshtein_score", method_levenshtein_score, METH_VARARGS,
-        "Levenshtein Score. Assesses the similarity between two strings by calculating "
-        "the levenshtein distance between the two and returning the proportion of the "
-        "difference between the maximum possible distance and the calculated distance " 
-        "to the maximum possible distance."
+        "adjusted_fss_major", method_adjusted_fss_major, METH_VARARGS,
+        "Adjusted Fragmented Substring Score - Major variant. "
+        "Assesses string similarity in the same manner as fss_major, but assesses "
+        "a penalty for differing relative distances between matching fragmented "
+        "substring characters across the two input strings. For example, "
+        "strings ABZZZ and AXXXB would receive a lower adjusted score than its base "
+        "fss score, as A & B are one character apart in the first string, but 4 "
+        "characters apart in the second. As a major variant, the raw score is scaled "
+        "against the longer string and returned as a float."
+    },
+    {
+        "adjusted_fss_minor", method_adjusted_fss_minor, METH_VARARGS,
+        "Adjusted Fragmented Substring Score - Minor variant. "
+        "Assesses string similarity in the samer manner as fss_minor, but assesses "
+        "a penalty for differing relative distances between matching fragmented "
+        "substring characters across the two input strings. For example, "
+        "strings ABZZZ and AXXXB would receive a lower adjusted score that its base "
+        "fss score, as A & B are one character apart in the first string, but 4 "
+        "characters apart in the second. As a minor variant, the raw score is scaled "
+        "against the shorter string and returned as a float."
+    },
+    {
+        "levenshtein_distance", method_levenshtein_distance, METH_VARARGS,
+        "Levenshtein Distance. Returns the levenshtein_distance between two strings. "
+        "The levenshtein distance is defined as the minimum number of single character "
+        "edits required to turn one string into another. (Edits include insertions, " 
+        "deletions, and substitutions.)"
+    },
+    {
+        "levenshtein_major", method_levenshtein_major, METH_VARARGS,
+        "Levenshtein Score - Major variant. "
+        "Assesses similarity between two strings based on their levenshtein distance, "
+        "returning a float representing the ratio of the levenshtein distance to the "
+        "length of the longer string."
+    },
+    {
+        "levenshtein_minor", method_levenshtein_minor, METH_VARARGS,
+        "Levenshtein Score - Minor variant. "
+        "Assesses similarity between two strings based on their levenshtein distance, "
+        "returning a float representing the ratio of the levenshtein distance to the "
+        "length of the shorter string."
     },
     {NULL, NULL, 0, NULL}
 };
@@ -322,7 +405,7 @@ Define python module struct
 static struct PyModuleDef strcompare_module = {
     PyModuleDef_HEAD_INIT,
     "strcompare",
-    "Methods to assess string similarity",
+    "Methods and utilities to assess string similarity",
     -1,
     strcompare_methods
 };

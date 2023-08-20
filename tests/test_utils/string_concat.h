@@ -9,6 +9,6 @@ Because <string.h> function strcat doesn't work like I need it to
 
 // Concat all provided strings in variable arg list, returning a pointer to a newly
 // allocated character array representing the full concatenated string
-char* string_concat(int num_strings, ...);
+char* string_concat(char* buffer, int num_strings, ...);
 
 #endif

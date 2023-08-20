@@ -10,7 +10,7 @@ Internal Declarations
 ========================================================================================*/
 
 static int _longestSubstring(
-    const char* str1, const char* str2, int len1, int len2, int* substrIdx
+    const char* str1, const char* str2, int len1, int len2, const char** substrPtr
 );
 static int _substringLength(const char* str1, const char* str2, int idx1, int idx2);
 
@@ -28,14 +28,11 @@ Internal Definitions
 /// @param str2 Second string. Assumed to be longer string. 
 /// @param len1 Length of the first string.
 /// @param len2 Length of the second string
-/// @param substrIdx Address of an integer. Will write to it the index (in str1) where
-/// the longest substring between the two beings. Note that the return value (the length)
-/// can provide information as to how to construct the longest substring from this index.
-/// If this behavior is not desired or
-/// neede, pass a NULL value here.
-/// @return 
+/// @param substrPtr Address of a character pointer. If not NULL, writes the address
+/// of the start of the longest substring from str1.
+/// @return Integer representing longest substring between two strings
 static int _longestSubstring(
-    const char* str1, const char* str2, int len1, int len2, int* substrIdx
+    const char* str1, const char* str2, int len1, int len2, const char** substrPtr
 )
 {
 
@@ -83,8 +80,8 @@ static int _longestSubstring(
     }
 
     IdxRef_deconstruct(&iref);
-    if (substrIdx != NULL)
-        *substrIdx = bestIdx;
+    if (substrPtr != NULL)
+        *substrPtr = (str1 + bestIdx);
 
     return max_substr_score;
 
@@ -184,9 +181,21 @@ double lss_minor(const char* str1, const char* str2)
 }
 
 
-// Returns the length of the longest substring found. Writes the index in str1
-// where it first appears into substrIdx
-int longest_substring(const char* str1, const char* str2, int* substrIdx)
+/// @brief Identifies the length of the longest substring between two strings. If 
+/// substrPtr is provided, writes the address where that substring beings into
+/// substrPtr.
+/// @param str1 First string to compare. 
+/// @param str2 Second string to compare.
+/// @param substrPtr Character pointer to some address within str1 where the longest
+/// substring begins. If passed NULL, does nothing. Note that the address will point
+/// to somewhere in str1, and the "substring" is not zero terminated. Instead, the
+/// length is indicated by the return value of the function. It is up to the caller
+/// at this point to call strncpy or equivalent to build the substring themselves.
+/// @return Integer representing the length of the longest sequence of common
+/// characters in order between two strings. 
+/// Example: STRESSED vs DESSERT would yield 4.
+/// substrPtr, in this example, would point to the address of the first "E" in STRESSED.
+int longest_substring(const char* str1, const char* str2, const char** substrPtr)
 {
     int len1 = strlen(str1);
     int len2 = strlen(str2);
@@ -194,13 +203,16 @@ int longest_substring(const char* str1, const char* str2, int* substrIdx)
 
     if ((len1 == 0) || (len2 == 0))
     {
-        *substrIdx = 0;
+        if (substrPtr != NULL)
+            *substrPtr = (str1 + len1);
         return 0;
     }
 
-    // Note that we do not control for length here, so caller knows which string
-    // substrIdx is provided for
-    longestLen = _longestSubstring(str1, str2, len1, len2, substrIdx);
+    if (len1 > len2)
+        longestLen = _longestSubstring(str2, str1, len2, len1, substrPtr);
+    else
+        longestLen = _longestSubstring(str1, str2, len1, len2, substrPtr);
+
     if (longestLen < 0)
         return -1;
 
@@ -208,14 +220,11 @@ int longest_substring(const char* str1, const char* str2, int* substrIdx)
 }
 
 
-// Sister method to longest_substring. Using the information provided/returned,
-// slices string into a substring based on length, pushing contents into destination.
-int build_substring(const char* str, int substrIdx, int substrLen, char* destination)
+// Since neither strcpy nor memcpy null-terminate the string, this function is provided
+// as a helpful utility
+char* substring(char* dest, const char* src, size_t len)
 {
-    for (int i = 0; i < substrLen; i++)
-    {
-        destination[i] = str[substrIdx];
-        substrIdx++;
-    }
-    destination[substrLen] = '\0';
+    memcpy(dest, src, len);
+    dest[len] = '\0';
+    return dest;
 }

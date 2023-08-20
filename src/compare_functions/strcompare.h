@@ -8,6 +8,8 @@ A collection of methods that compare two strings to assess their similarity
 #ifndef INCLUDE_GUARD_STRCOMPARE
 #define INCLUDE_GUARD_STRCOMPARE
 
+#include <stdlib.h>
+
 
 /// @brief Compare two strings by assessing differences in their distribution of
 /// characters
@@ -29,8 +31,8 @@ double adjusted_fss_major(const char* str1, const char* str2);
 double adjusted_fss_minor(const char* str1, const char* str2);
 
 
-int longest_substring(const char* str1, const char* str2, int* substrIdx);
-int build_substring(const char* str, int substrIdx, int substrLen, char* destination);
+int longest_substring(const char* str1, const char* str2, const char** substrPtr);
+char* substring(char* dest, const char* src, size_t len);
 double lss_major(const char* str1, const char* str2);
 double lss_minor(const char* str1, const char* str2);
 

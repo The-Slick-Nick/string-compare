@@ -11,10 +11,13 @@
 #define CHARSET_EXTENDED        3
 
 
-// Returns a string of random characters of random length
-char* random_string();
+// Writes a randomized string into the provided character buffer
+// Note that it is up to the caller to ensure that the buffer is at least as long
+// as RANDOMSTR_MAX_LENGTH
+char* random_string(char* buffer);
 
-// Returns a random string of characters from only one specific character set
-char* random_string_charset(int char_set);
+// Writes a randomized string into the provided character buffer, picking only
+// characters from a specific character set.
+char* random_string_charset(char* buffer, int char_set);
 
 #endif
