@@ -5,7 +5,7 @@
 
 /* API definitions */
 
-void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref)
+bool IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref)
 {
     int i;
     unsigned char chri;
@@ -29,6 +29,10 @@ void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref)
     // We allocate one extra slot, as index 0 is used for "unreserved", so we never
     // actually use it as an index.
     self->idx_arr = (int*)malloc((1 + total_size) * sizeof(int));
+
+    if (self->idx_arr == NULL)
+        return false;
+
     *(self->idx_arr) = -1;
 
     current_offset = 1;
@@ -52,7 +56,7 @@ void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref)
     }
 
     self->active = true;
-
+    return true;
 }
 
 int IdxRef_getIndex(IdxRef* self, unsigned char chr, int chr_num)

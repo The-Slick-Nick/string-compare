@@ -57,7 +57,9 @@ Public methods
 /// @param str Basis string to build from.
 /// @param chr_counts 256-sized integer array, already initialzied to 0s
 /// @param ptr_ref 256-sized integer array, already initialized to 0s
-void IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref);
+/// @return Boolean flag indicating if build was successful. If false, memory allocation
+/// failed and IdxRef did not build successfully.
+bool IdxRef_build(IdxRef* self, const char* str, int* chr_counts, int* ptr_ref);
 
 // Retrieve ith index for a given character from idx_ref 
 

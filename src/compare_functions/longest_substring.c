@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdbool.h>
 
 #include "strcompare.h"
 #include "IdxRef.h"
@@ -8,8 +9,9 @@
 Internal Declarations
 ========================================================================================*/
 
-static int _longestSubstring(const char* str1, const char* str2, int len1, int len2);
-static int _naiveLongestSubstring(const char* str1, const char* str2, int len1, int lent2);
+static int _longestSubstring(
+    const char* str1, const char* str2, int len1, int len2, char* destination
+);
 static int _substringLength(const char* str1, const char* str2, int idx1, int idx2);
 
 /*========================================================================================
@@ -19,13 +21,29 @@ Internal Definitions
 // Internal call to determine the longest substring.
 // Assumes that str1 is the shorter of the two strings.
 // len1 and len2 represent the lengths of str1 and str2, respectively
-static int _longestSubstring(const char* str1, const char* str2, int len1, int len2)
+// Returns -1 if memory allocation fails
+
+/// @brief Internal worker function for longest substrings
+/// @param str1 First string. Assumed to be shorter string
+/// @param str2 Second string. Assumed to be longer string. 
+/// @param len1 Length of the first string.
+/// @param len2 Length of the second string
+/// @param substrIdx Address of an integer. Will write to it the index (in str1) where
+/// the longest substring between the two beings. Note that the return value (the length)
+/// can provide information as to how to construct the longest substring from this index.
+/// If this behavior is not desired or
+/// neede, pass a NULL value here.
+/// @return 
+static int _longestSubstring(
+    const char* str1, const char* str2, int len1, int len2, char* destination
+)
 {
 
-    int idx1;
-    int idx2;
-    int max_substr_score;
-    int substr_score;
+    int idx1;               // Index for indexing str1
+    int idx2;               // Index for indexing str2
+    int max_substr_score;   // Current maximum substring length tabulated
+    int substr_score;       // Length of current considered substring
+    int bestIdx;            // idx1 where the current max_substr_score was found
 
     unsigned char curChr;
 
@@ -34,9 +52,11 @@ static int _longestSubstring(const char* str1, const char* str2, int len1, int l
     int ptr_ref[256] = {0};
 
     // Build our reference off of the shorter string
-    IdxRef_build(&iref, str1, chr_counts, ptr_ref);
+    if (!IdxRef_build(&iref, str1, chr_counts, ptr_ref))
+        return -1;
 
     max_substr_score = 0;
+    bestIdx = 0;
     for (idx2 = 0; idx2 < len2; idx2++)
     {
         // Break when we can't find a better score
@@ -54,50 +74,28 @@ static int _longestSubstring(const char* str1, const char* str2, int len1, int l
                 break;
 
             substr_score = _substringLength(str1, str2, idx1, idx2);
-            max_substr_score = imax(max_substr_score, substr_score);
+            if (substr_score > max_substr_score)
+            {
+                max_substr_score = substr_score;
+                bestIdx = idx1;
+            }
         }
     }
 
     IdxRef_deconstruct(&iref);
-    return max_substr_score;
-
-}
-
-// Performs naive algorithm to calculate longest substring. Assumes str1 is the shorter
-// of the two strings. 
-static int _naiveLongestSubstring(const char* str1, const char* str2, int len1, int len2)
-{
-    int idx1;
-    int idx2;
-
-    // unsigned char chr1;
-    // unsigned char chr2;
-
-    int substr_score = 0;
-    int max_substr_score = 0;
-
-    for (idx1 = 0; idx1 < len1; idx1++)
+    if (destination != NULL)
     {
-        if ( (len1 - idx1) <= max_substr_score)
-            break;
-
-        idx2 = 0;
-
-        // Consider every idx2 starter for each idx1
-        while (idx2 < len2)
+        idx1 = bestIdx;
+        for (int returnIdx = 0; returnIdx < max_substr_score; returnIdx++)
         {
-            // Exit when we can't find a longer substr
-            if ( (len2 - idx2) <= max_substr_score)
-                break;
-
-            substr_score = _substringLength(str1, str2, idx1, idx2);
-            max_substr_score = imax(max_substr_score, substr_score);
-
-            idx2++;
+            destination[returnIdx] = str1[idx1];
+            idx1++;
         }
+        destination[max_substr_score] = '\0';  // escape character
     }
 
     return max_substr_score;
+
 }
 
 
@@ -132,11 +130,12 @@ static int _substringLength(const char* str1, const char* str2, int idx1, int id
 API Definitions
 ========================================================================================*/
 
-double lcs_score(const char* str1, const char* str2)
+double lss_major(const char* str1, const char* str2)
 {
     int len1 = strlen(str1);
     int len2 = strlen(str2);
     int longestLen;
+    int denom;
 
     if ((len1 == 0) && (len2 == 0))
         return 1;
@@ -144,25 +143,30 @@ double lcs_score(const char* str1, const char* str2)
     if ((len1 == 0) != (len2 == 0))
         return 0;
 
-
     if (len1 > len2)
     {
-        longestLen = _longestSubstring(str2, str1, len2, len1);
-        return longestLen / (double)len2;
+        longestLen = _longestSubstring(str2, str1, len2, len1, NULL);
+        denom = len1;
     }
     else
     {
-        longestLen = _longestSubstring(str1, str2, len1, len2);
-        return longestLen / (double)len1;
+        longestLen = _longestSubstring(str1, str2, len1, len2, NULL);
+        denom = len2;
     }
 
+    if (longestLen < 0)
+        return -1;
+
+    return longestLen / (double)denom;
+    
 }
 
-double naive_lcs_score(const char* str1, const char* str2)
+double lss_minor(const char* str1, const char* str2)
 {
     int len1 = strlen(str1);
     int len2 = strlen(str2);
     int longestLen;
+    int denom;
 
     if ((len1 == 0) && (len2 == 0))
         return 1;
@@ -172,12 +176,44 @@ double naive_lcs_score(const char* str1, const char* str2)
 
     if (len1 > len2)
     {
-        longestLen = _naiveLongestSubstring(str2, str1, len2, len1);
-        return longestLen / (double)len2;
+        longestLen = _longestSubstring(str2, str1, len2, len1, NULL);
+        denom = len2;
     }
     else
     {
-        longestLen = _naiveLongestSubstring(str1, str2, len1, len2);
-        return longestLen / (double)len1;
+        longestLen = _longestSubstring(str1, str2, len1, len2, NULL);
+        denom = len1;
     }
+
+    if (longestLen < 0)
+        return -1;
+
+    return longestLen / (double)denom;
+}
+
+
+// Returns the length of the string found. If destination is not NULL,
+// writes the resulting longest substring to it (or as much as is possible, if
+// destination is too small)
+int longest_substring(const char* str1, const char* str2, char* destination)
+{
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+    int longestLen;
+
+    if ((len1 == 0) || (len2 == 0))
+    {
+        destination[0] = '\0';
+        return 0;
+    }
+
+    if (len1 > len2)
+        longestLen = _longestSubstring(str2, str1, len2, len1, destination);
+    else
+        longestLen = _longestSubstring(str1, str2, len1, len2, destination);
+
+    if (longestLen < 0)
+        return -1;
+
+    return longestLen;
 }
