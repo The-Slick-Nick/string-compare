@@ -1,7 +1,7 @@
 /*========================================================================================
 strcompare_module.c
 Pythod module definition for strcompare.
-Version 1.2.1
+Version 2.0.0
 
 Relevant Files
 ------------------
@@ -181,15 +181,15 @@ static PyObject* method_fss_minor(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
         return NULL;
 
-    score = fss_major(str1, str2);
+    score = fss_minor(str1, str2);
 
     if (score < 0)
     {
-        PyErr_SetString(PyExc_MemoryError, "Error allocating memory for fss_major.");
+        PyErr_SetString(PyExc_MemoryError, "Error allocating memory for fss_minor.");
         return NULL;
     }
 
-    return Pyfloat_FromDouble(score);
+    return PyFloat_FromDouble(score);
 }
 
 // Wraps adjusted_fss_major
@@ -224,7 +224,7 @@ static PyObject* method_adjusted_fss_minor(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ss", &str1, &str2))
         return NULL;
 
-    score = adjusted_fss_major(str1, str2);
+    score = adjusted_fss_minor(str1, str2);
     if (score < 0)
     {
         PyErr_SetString(
@@ -274,7 +274,7 @@ static PyObject* method_levenshtein_major(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return Pyfloat_FromDouble(score);
+    return PyFloat_FromDouble(score);
 }
 
 // Wraps levenshtein_minor
@@ -295,7 +295,7 @@ static PyObject* method_levenshtein_minor(PyObject* self, PyObject* args)
         return NULL;
     }
 
-    return Pyfloat_FromDouble(score);
+    return PyFloat_FromDouble(score);
 }
 
 /*========================================================================================
