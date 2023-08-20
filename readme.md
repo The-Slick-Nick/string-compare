@@ -12,7 +12,7 @@ Every string assessment score adheres to the following rules/properties, given c
     * As a corollary, $func(x, y) = 0$ if exactly one of $x$ and $y$ are empty.
 
 Additionally, several different scoring methodologies come with "major" and "minor" variants. Minor variants additionally exhibit the following property:
-* $func(x, y) = 1$ if $x ∈ y$, or $y ∈ x$
+* $func(x, y) = 1$ if $x \subseteq y$, or $y \subseteq x$
 
 <br />
 <br />

@@ -1,2 +1,6 @@
 pip wheel .
+twine upload -r testpypi dist/{version}/*
 twine upload dist/{version}/*
+
+username: __token__
+password {myApiToken}
